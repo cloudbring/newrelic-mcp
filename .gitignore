@@ -11,3 +11,14 @@ test-results/
 *.swp
 *.swo
 *~
+
+# Claude Flow and AI assistant directories
+.claude-flow/
+.hive-mind/
+.swarm/
+
+# Test artifacts
+test-*.js
+*.js
+!vitest.config.js
+run-inspector.sh
