@@ -96,18 +96,42 @@ export class EntityTool {
           name
           type
           domain
+          entityType
+          reporting
           tags {
             key
             values
           }
           ... on AlertableEntity {
             alertSeverity
+            recentAlertViolations {
+              alertSeverity
+              violationId
+              openedAt
+              closedAt
+              violationUrl
+            }
           }
           ... on ApmApplicationEntity {
             language
-            reporting
             settings {
               apdexTarget
+            }
+          }
+          relationships {
+            type
+            target {
+              entities {
+                guid
+                name
+              }
+            }
+          }
+          goldenMetrics {
+            metrics {
+              name
+              value
+              unit
             }
           }
         }
@@ -115,6 +139,12 @@ export class EntityTool {
     }`;
 
     const response = await this.client.executeNerdGraphQuery(graphqlQuery);
-    return response.data?.actor?.entity || null;
+    const entity = response.data?.actor?.entity;
+    
+    if (!entity) {
+      throw new Error('Entity not found');
+    }
+    
+    return entity;
   }
 }

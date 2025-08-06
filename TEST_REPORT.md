@@ -3,13 +3,15 @@
 ## ✅ All Tests Passing
 
 ### Test Summary
+
 - **Total Test Files**: 4 passing
 - **Total Tests**: 37 passing
 - **Duration**: ~1.1s
 - **Evalite Score**: 92%
 
 ### Test Coverage
-```
+
+```bash
 File               | % Stmts | % Branch | % Funcs | % Lines
 -------------------|---------|----------|---------|--------
 All files          |   64.33 |    92.06 |   70.37 |   64.33
@@ -29,6 +31,7 @@ All files          |   64.33 |    92.06 |   70.37 |   64.33
 ### Test Categories
 
 #### ✅ Unit Tests (22 tests)
+
 - **Server Tests** (`test/server/server.test.ts`) - 11 tests
   - Server initialization
   - Tool registration
@@ -43,6 +46,7 @@ All files          |   64.33 |    92.06 |   70.37 |   64.33
   - Account ID validation
 
 #### ✅ BDD Feature Tests (15 tests)
+
 - **NRQL Queries** (`test/features/common/nrql-queries.test.ts`) - 7 tests
   - Simple query execution
   - Cross-account queries
@@ -57,6 +61,7 @@ All files          |   64.33 |    92.06 |   70.37 |   64.33
   - Tags and language validation
 
 #### ✅ Evalite LLM Validation (5 evaluations)
+
 - **NRQL Response Evaluation** - 3 test cases
   - Schema validation
   - Metadata completeness
@@ -100,7 +105,7 @@ npm run test:eval:watch
 
 ### Test Architecture
 
-```
+```bash
 test/
 ├── server/               # Server unit tests
 │   └── server.test.ts
@@ -123,6 +128,7 @@ test/
 ### Continuous Integration Ready
 
 The test suite is ready for CI/CD integration with:
+
 - Fast execution time
 - Deterministic results
 - Comprehensive coverage reporting

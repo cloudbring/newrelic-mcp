@@ -34,9 +34,9 @@ export class NewRelicClient {
   private apiKey: string;
   private defaultAccountId?: string;
 
-  constructor(apiKey: string, defaultAccountId?: string) {
-    this.apiKey = apiKey;
-    this.defaultAccountId = defaultAccountId;
+  constructor(apiKey?: string, defaultAccountId?: string) {
+    this.apiKey = apiKey || process.env.NEW_RELIC_API_KEY || '';
+    this.defaultAccountId = defaultAccountId || process.env.NEW_RELIC_ACCOUNT_ID;
   }
 
   async validateCredentials(): Promise<boolean> {
@@ -199,17 +199,24 @@ export class NewRelicClient {
     return result;
   }
 
-  async executeNerdGraphQuery(query: string): Promise<any> {
+  async executeNerdGraphQuery(query: string, variables?: any): Promise<any> {
+    if (!this.apiKey) {
+      throw new Error('NEW_RELIC_API_KEY environment variable is not set');
+    }
+
     const response = await fetch(NERDGRAPH_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'API-Key': this.apiKey
       },
-      body: JSON.stringify({ query })
+      body: JSON.stringify({ query, variables })
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Unauthorized: Invalid API key');
+      }
       throw new Error(`NerdGraph API error: ${response.status} ${response.statusText}`);
     }
 

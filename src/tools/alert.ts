@@ -145,16 +145,58 @@ export class AlertTool {
       mutation {
         aiIssuesAcknowledge(
           issueIds: ["${input.incident_id}"]
+          ${input.comment ? `, comment: "${input.comment}"` : ''}
         ) {
           issues {
             issueId
             state
+            acknowledgedAt
+            acknowledgedBy
+            ${input.comment ? 'comment' : ''}
+          }
+          errors {
+            type
+            description
           }
         }
       }
     `;
 
     const response = await this.client.executeNerdGraphQuery(mutation);
-    return response.data?.aiIssuesAcknowledge || { success: false };
+    const result = response.data?.aiIssuesAcknowledge;
+    
+    if (result?.errors && result.errors.length > 0) {
+      throw new Error(result.errors[0].description);
+    }
+    
+    return result?.issues?.[0] || null;
+  }
+
+  async acknowledgeIncidents(input: any): Promise<any> {
+    const mutation = `
+      mutation {
+        aiIssuesAcknowledge(
+          issueIds: ${JSON.stringify(input.incident_ids)}
+        ) {
+          issues {
+            issueId
+            state
+          }
+          errors {
+            type
+            description
+          }
+        }
+      }
+    `;
+
+    const response = await this.client.executeNerdGraphQuery(mutation);
+    const result = response.data?.aiIssuesAcknowledge;
+    
+    if (result?.errors && result.errors.length > 0) {
+      throw new Error(result.errors[0].description);
+    }
+    
+    return result?.issues || [];
   }
 }

@@ -140,7 +140,7 @@ export class NewRelicMCPServer {
   }
 
   async executeTool(name: string, args: any): Promise<any> {
-    const accountId = args.target_account_id || this.defaultAccountId;
+    const accountId = args.target_account_id || args.account_id || this.defaultAccountId;
     
     if (!accountId && this.requiresAccountId(name)) {
       throw new Error('Account ID must be provided');
@@ -159,13 +159,43 @@ export class NewRelicMCPServer {
         });
       case 'get_account_details':
         return await this.client.getAccountDetails(accountId);
+      case 'list_alert_policies':
+        return await new AlertTool(this.client).listAlertPolicies({
+          ...args,
+          target_account_id: accountId
+        });
+      case 'list_open_incidents':
+        return await new AlertTool(this.client).listOpenIncidents({
+          ...args,
+          target_account_id: accountId
+        });
+      case 'acknowledge_incident':
+        return await new AlertTool(this.client).acknowledgeIncident(args);
+      case 'search_entities':
+        return await new EntityTool(this.client).searchEntities({
+          ...args,
+          target_account_id: accountId
+        });
+      case 'get_entity_details':
+        return await new EntityTool(this.client).getEntityDetails(args);
+      case 'list_synthetics_monitors':
+        return await new SyntheticsTool(this.client).listSyntheticsMonitors({
+          ...args,
+          target_account_id: accountId
+        });
+      case 'create_browser_monitor':
+        return await new SyntheticsTool(this.client).createBrowserMonitor({
+          ...args,
+          target_account_id: accountId
+        });
+      case 'execute_nerdgraph_query':
+        return await new NerdGraphTool(this.client).execute(args);
       default:
         const tool = this.tools.get(name);
         if (!tool) {
           throw new Error(`Tool ${name} not found`);
         }
-        // Execute tool through respective handler
-        return await this.executeToolHandler(name, args);
+        throw new Error(`Tool handler for ${name} not implemented`);
     }
   }
 
@@ -174,14 +204,13 @@ export class NewRelicMCPServer {
       'run_nrql_query',
       'list_apm_applications',
       'search_entities',
-      'get_account_details'
+      'get_account_details',
+      'list_alert_policies',
+      'list_open_incidents',
+      'list_synthetics_monitors',
+      'create_browser_monitor'
     ];
     return accountRequiredTools.includes(toolName);
-  }
-
-  private async executeToolHandler(name: string, args: any): Promise<any> {
-    // Delegate to specific tool handlers
-    throw new Error(`Tool handler for ${name} not implemented`);
   }
 
   getMetadata() {
