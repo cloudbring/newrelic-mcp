@@ -3,6 +3,7 @@ dist/
 coverage/
 test-results/
 .env
+.env.test
 .env.local
 *.log
 .DS_Store
