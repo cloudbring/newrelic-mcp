@@ -12,12 +12,15 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:integration": "USE_REAL_ENV=true vitest",
     "test:bdd": "vitest --run test/features/**/*.spec.ts",
     "test:unit": "vitest --run test/**/*.test.ts",
     "test:eval": "evalite",
     "test:eval:watch": "evalite watch",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/server.js",
+    "inspect:dev": "npx @modelcontextprotocol/inspector tsx src/server.ts"
   },
   "keywords": [],
   "author": "",

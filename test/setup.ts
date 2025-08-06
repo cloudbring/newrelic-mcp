@@ -1,7 +1,9 @@
 import { beforeAll, afterAll, beforeEach } from 'vitest';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env' });
+// Load .env.test which contains real New Relic credentials for test telemetry
+// This allows us to monitor test execution in New Relic
+dotenv.config({ path: '.env.test' });
 
 beforeAll(() => {
   console.log('Starting test suite for New Relic MCP Server');

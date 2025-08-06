@@ -6,8 +6,8 @@ export default defineConfig({
     environment: 'node',
     setupFiles: [
       './test/setup.ts', 
-      'dotenv/config'
-      // './test/setup/vitest-hooks.ts' // Disabled temporarily for testing
+      'dotenv/config',
+      './test/setup/vitest-hooks.ts' // Enable telemetry hooks for New Relic monitoring
     ],
     include: ['test/**/*.test.ts', 'test/**/*.spec.ts'],
     exclude: ['node_modules', 'dist'],
