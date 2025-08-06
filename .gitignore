@@ -8,7 +8,12 @@ test-results/
 *.log
 .DS_Store
 .idea/
-.vscode/
+# VS Code settings - keep project settings, ignore personal
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
 *.swp
 *.swo
 *~

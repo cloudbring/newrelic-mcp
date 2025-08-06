@@ -1,0 +1,105 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Universal settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# TypeScript and JavaScript files
+[*.{ts,tsx,js,jsx,mjs,cjs}]
+indent_size = 2
+max_line_length = 100
+
+# JSON files
+[*.{json,jsonc}]
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown files
+[*.{md,mdx}]
+# Preserve trailing whitespace in markdown for line breaks
+trim_trailing_whitespace = false
+max_line_length = 100
+
+# Package files
+[package*.json]
+indent_size = 2
+
+# Configuration files
+[.{babelrc,eslintrc,prettierrc,stylelintrc}]
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+end_of_line = lf
+indent_size = 2
+
+# Batch files
+[*.{bat,cmd}]
+end_of_line = crlf
+indent_size = 2
+
+# Makefiles
+[Makefile]
+indent_style = tab
+
+# Git config files
+[.git*]
+indent_size = 2
+
+# Docker files
+[{Dockerfile,docker-compose.yml}]
+indent_size = 2
+
+# Environment files
+[.env*]
+indent_size = 2
+
+# Test files
+[*.{test,spec}.{ts,tsx,js,jsx}]
+indent_size = 2
+
+# Feature files (Gherkin)
+[*.feature]
+indent_size = 2
+
+# Vitest config
+[vitest.config.*]
+indent_size = 2
+
+# TypeScript config
+[tsconfig*.json]
+indent_size = 2
+
+# Biome config
+[biome.json]
+indent_size = 2
+
+# HTML files
+[*.html]
+indent_size = 2
+max_line_length = 100
+
+# CSS/SCSS files
+[*.{css,scss,sass,less}]
+indent_size = 2
+max_line_length = 100
+
+# XML files
+[*.xml]
+indent_size = 2
+
+# Ignore files
+[*.{gitignore,dockerignore,npmignore}]
+insert_final_newline = true
+trim_trailing_whitespace = true

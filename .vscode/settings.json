@@ -1,0 +1,127 @@
+{
+  // Auto-save configuration
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+
+  // Editor settings
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "editor.renderWhitespace": "trailing",
+  "editor.trimAutoWhitespace": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 100,
+  "editor.rulers": [100],
+
+  // File settings
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.encoding": "utf8",
+
+  // TypeScript settings
+  "typescript.preferences.quoteStyle": "single",
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.format.semicolons": "insert",
+  "javascript.format.semicolons": "insert",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+
+  // Biome extension settings (if installed)
+  "editor.defaultFormatter": "biomejs.biome",
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+
+  // Format on save for specific file types
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false,
+    "editor.formatOnSave": true
+  },
+
+  // Exclude files from file explorer
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/coverage": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/.claude-flow": true,
+    "**/.hive-mind": true,
+    "**/.swarm": true
+  },
+
+  // Search exclusions
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.git": true,
+    "**/*.log": true,
+    "**/.claude-flow": true,
+    "**/.hive-mind": true,
+    "**/.swarm": true
+  },
+
+  // Test runner settings
+  "vitest.enable": true,
+  "vitest.commandLine": "npm run test",
+
+  // Git settings
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+
+  // Terminal settings
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.windows": "powershell",
+
+  // Spell checker settings (if cSpell extension is installed)
+  "cSpell.words": [
+    "Biome",
+    "biomejs",
+    "nerdgraph",
+    "newrelic",
+    "NRQL",
+    "opentelemetry",
+    "otel",
+    "Smithery",
+    "vitest",
+    "gherkin",
+    "evalite",
+    "autoevals",
+    "Ultracite",
+    "modelcontextprotocol",
+    "jsonrpc"
+  ],
+
+  // File associations
+  "files.associations": {
+    "*.mdx": "markdown",
+    ".env*": "dotenv",
+    "*.feature": "cucumber"
+  },
+
+  // Editor config support
+  "editor.useTabStops": false,
+  "editor.tabCompletion": "on"
+}

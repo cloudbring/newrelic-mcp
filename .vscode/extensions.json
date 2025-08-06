@@ -1,0 +1,46 @@
+{
+  "recommendations": [
+    // Biome for linting and formatting
+    "biomejs.biome",
+
+    // EditorConfig support
+    "editorconfig.editorconfig",
+
+    // TypeScript and JavaScript
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+
+    // Testing
+    "vitest.explorer",
+    "alexkrechik.cucumberautocomplete",
+
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+
+    // Markdown
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+
+    // Environment variables
+    "mikestead.dotenv",
+
+    // Spell checker
+    "streetsidesoftware.code-spell-checker",
+
+    // YAML support
+    "redhat.vscode-yaml",
+
+    // JSON support
+    "zainchen.json",
+
+    // Path intellisense
+    "christian-kohler.path-intellisense",
+
+    // npm
+    "christian-kohler.npm-intellisense",
+
+    // Better comments
+    "aaron-bond.better-comments"
+  ]
+}
