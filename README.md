@@ -125,7 +125,7 @@ Add to your Windsurf Cascade configuration:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/qai-run/newrelic-mcp.git
+git clone https://github.com/cloudbring/newrelic-mcp.git
 cd newrelic-mcp
 ```
 
@@ -275,7 +275,7 @@ src/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/qai-run/newrelic-mcp.git
+git clone https://github.com/cloudbring/newrelic-mcp.git
 cd newrelic-mcp
 ```
 
@@ -406,10 +406,10 @@ This project uses:
 
 ## Support
 
-- 🐛 [Report bugs](https://github.com/qai-run/newrelic-mcp/issues)
-- 💡 [Request features](https://github.com/qai-run/newrelic-mcp/issues)
-- 💬 [Join discussions](https://github.com/qai-run/newrelic-mcp/discussions)
-- 📖 [Read the docs](https://github.com/qai-run/newrelic-mcp/tree/main/docs)
+- 🐛 [Report bugs](https://github.com/cloudbring/newrelic-mcp/issues)
+- 💡 [Request features](https://github.com/cloudbring/newrelic-mcp/issues)
+- 💬 [Join discussions](https://github.com/cloudbring/newrelic-mcp/discussions)
+- 📖 [Read the docs](https://github.com/cloudbring/newrelic-mcp/tree/main/docs)
 
 ## License
 

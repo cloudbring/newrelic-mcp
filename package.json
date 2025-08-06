@@ -6,18 +6,24 @@
   "bin": {
     "newrelic-mcp": "./dist/server.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "directories": {
     "test": "test",
     "doc": "docs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qai-run/newrelic-mcp.git"
+    "url": "git+https://github.com/cloudbring/newrelic-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/qai-run/newrelic-mcp/issues"
+    "url": "https://github.com/cloudbring/newrelic-mcp/issues"
   },
-  "homepage": "https://github.com/qai-run/newrelic-mcp#readme",
+  "homepage": "https://github.com/cloudbring/newrelic-mcp#readme",
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/server.ts",
