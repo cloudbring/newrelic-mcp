@@ -19,9 +19,7 @@ export default defineConfig({
         'test/',
         'dist/',
         '*.config.ts',
-        '**/*.eval.ts',
-        'src/logger/**',
-        'src/instrumentation/**'
+        '**/*.eval.ts'
       ]
     },
     // Test timeout for OpenTelemetry operations

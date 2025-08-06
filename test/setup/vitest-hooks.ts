@@ -11,7 +11,7 @@ let trace: any;
 let context: any;
 
 try {
-  const loggerModule = await import('../../src/logger/winston-logger');
+  const loggerModule = await import('../utils/logging/winston-logger');
   logger = loggerModule.logger;
   createChildLogger = loggerModule.createChildLogger;
 } catch (error) {
@@ -21,7 +21,7 @@ try {
 }
 
 try {
-  const otelModule = await import('../../src/instrumentation/otel-setup');
+  const otelModule = await import('../utils/instrumentation/otel-setup');
   initializeOpenTelemetry = otelModule.initializeOpenTelemetry;
   shutdownOpenTelemetry = otelModule.shutdownOpenTelemetry;
   getTracer = otelModule.getTracer;

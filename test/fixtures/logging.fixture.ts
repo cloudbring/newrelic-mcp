@@ -1,7 +1,6 @@
 import { test as base, vi, expect } from 'vitest';
 import winston from 'winston';
-import { getTestTracer } from '../../src/instrumentation/otel-setup';
-import { trace } from '@opentelemetry/api';
+import { getTestTracer } from '../utils/instrumentation/otel-setup';
 
 // Define fixture types
 export interface LogCapture {
