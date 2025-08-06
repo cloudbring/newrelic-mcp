@@ -241,4 +241,4 @@ Contributors are recognized in:
 - Release notes for significant contributions
 - README acknowledgments for major features
 
-Thank you for contributing to New Relic MCP! 🎉
+Thank you for contributing! 🎉

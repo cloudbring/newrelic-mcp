@@ -55,7 +55,7 @@
     "llm",
     "claude"
   ],
-  "author": "New Relic MCP Contributors",
+  "author": "@cloudbring",
   "license": "MIT",
   "devDependencies": {
     "@amiceli/vitest-cucumber": "^5.1.2",

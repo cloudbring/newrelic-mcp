@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server that provides seamless integration with New Relic's observability platform. Query metrics, manage alerts, monitor applications, and interact with your entire observability stack through a simple, unified interface.
 
+> **Disclaimer**: This is an unofficial community project and is not affiliated with, endorsed by, or supported by New Relic, Inc. All trademarks are the property of their respective owners.
+
 ## Features
 
 - 📊 **NRQL Queries** - Execute powerful queries to analyze your data
@@ -413,12 +415,16 @@ This project uses:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Disclaimer
+
+This project is not affiliated with, endorsed by, or supported by New Relic, Inc. It is an independent open-source project that uses New Relic's public APIs.
+
 ## Acknowledgments
 
 - Built on the [Model Context Protocol](https://modelcontextprotocol.io) specification
-- Powered by [New Relic's](https://newrelic.com) observability platform
-- Inspired by the MCP community and ecosystem
+- Integrates with [New Relic's](https://newrelic.com) observability platform APIs
+- Inspired by the broader MCP ecosystem
 
 ---
 
-Made with ❤️ by the New Relic MCP community
+Made with ❤️ by [@cloudbring](https://github.com/cloudbring) using Cursor and Claude Code
