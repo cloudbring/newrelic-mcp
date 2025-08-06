@@ -200,7 +200,8 @@ export class NewRelicClient {
   }
 
   async executeNerdGraphQuery(query: string, variables?: any): Promise<any> {
-    if (!this.apiKey) {
+    // Check if API key is missing or empty
+    if (!this.apiKey || this.apiKey === '' || this.apiKey.length === 0) {
       throw new Error('NEW_RELIC_API_KEY environment variable is not set');
     }
 

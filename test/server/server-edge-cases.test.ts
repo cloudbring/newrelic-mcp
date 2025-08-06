@@ -80,12 +80,14 @@ describe('NewRelic MCP Server Edge Cases', () => {
   });
 
   describe('Environment validation', () => {
-    it('should handle missing environment variables gracefully', async () => {
+    it('should throw error when API key is missing', async () => {
+      const originalApiKey = process.env.NEW_RELIC_API_KEY;
       delete process.env.NEW_RELIC_API_KEY;
-      delete process.env.NEW_RELIC_ACCOUNT_ID;
 
-      const serverNoEnv = new NewRelicMCPServer();
-      expect(serverNoEnv).toBeDefined();
+      expect(() => new NewRelicMCPServer()).toThrow('NEW_RELIC_API_KEY is required');
+      
+      // Restore the env var
+      process.env.NEW_RELIC_API_KEY = originalApiKey;
     });
   });
 

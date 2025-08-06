@@ -254,10 +254,17 @@ describe('NewRelicClient', () => {
     });
 
     it('should throw error for missing API key', async () => {
+      // Temporarily remove the env var to test missing API key scenario
+      const originalApiKey = process.env.NEW_RELIC_API_KEY;
+      delete process.env.NEW_RELIC_API_KEY;
+      
       const clientNoKey = new NewRelicClient('', '123456');
       
       await expect(clientNoKey.executeNerdGraphQuery('{ actor { user { id } } }'))
         .rejects.toThrow('NEW_RELIC_API_KEY environment variable is not set');
+        
+      // Restore the env var
+      process.env.NEW_RELIC_API_KEY = originalApiKey;
     });
 
     it('should handle 401 unauthorized', async () => {
