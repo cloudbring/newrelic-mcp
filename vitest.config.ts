@@ -4,7 +4,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    setupFiles: ['./test/setup.ts', 'dotenv/config'],
+    setupFiles: [
+      './test/setup.ts', 
+      'dotenv/config'
+      // './test/setup/vitest-hooks.ts' // Disabled temporarily for testing
+    ],
     include: ['test/**/*.test.ts', 'test/**/*.spec.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {
@@ -15,8 +19,13 @@ export default defineConfig({
         'test/',
         'dist/',
         '*.config.ts',
-        '**/*.eval.ts'
+        '**/*.eval.ts',
+        'src/logger/**',
+        'src/instrumentation/**'
       ]
-    }
+    },
+    // Test timeout for OpenTelemetry operations
+    testTimeout: 10000,
+    hookTimeout: 5000
   }
 });

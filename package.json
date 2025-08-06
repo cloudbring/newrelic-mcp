@@ -37,8 +37,16 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.62.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.203.0",
+    "@opentelemetry/instrumentation-winston": "^0.48.0",
+    "@opentelemetry/resources": "^2.0.1",
+    "@opentelemetry/sdk-node": "^0.203.0",
+    "@opentelemetry/semantic-conventions": "^1.36.0",
     "dotenv": "^17.2.1",
     "newrelic": "^13.0.0",
+    "winston": "^3.17.0",
     "zod": "^3.25.76"
   }
 }
