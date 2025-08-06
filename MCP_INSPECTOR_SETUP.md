@@ -186,7 +186,7 @@ DEBUG=* npx @modelcontextprotocol/inspector node dist/server.js
 ```json
 {
   "nrql": "SELECT count(*) FROM Transaction WHERE appName = 'My App' SINCE 1 hour ago",
-  "target_account_id": "6976669"
+  "target_account_id": "YOUR_ACCOUNT_ID"
 }
 ```
 
@@ -194,7 +194,7 @@ DEBUG=* npx @modelcontextprotocol/inspector node dist/server.js
 ```json
 {
   "query": "{ actor { user { name email } } }",
-  "target_account_id": "6976669"
+  "target_account_id": "YOUR_ACCOUNT_ID"
 }
 ```
 
@@ -202,7 +202,7 @@ DEBUG=* npx @modelcontextprotocol/inspector node dist/server.js
 ```json
 {
   "query": "type = 'APPLICATION' AND reporting = 'true'",
-  "target_account_id": "6976669"
+  "target_account_id": "YOUR_ACCOUNT_ID"
 }
 ```
 
