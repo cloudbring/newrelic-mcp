@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('Synthetics Monitors Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -22,9 +22,7 @@ describe('Synthetics Monitors Feature', () => {
                     monitorType: 'SIMPLE',
                     period: 'EVERY_5_MINUTES',
                     monitoredUrl: 'https://example.com',
-                    tags: [
-                      { key: 'team', values: ['frontend'] }
-                    ]
+                    tags: [{ key: 'team', values: ['frontend'] }],
                   },
                   {
                     guid: 'monitor-2',
@@ -32,35 +30,35 @@ describe('Synthetics Monitors Feature', () => {
                     monitorType: 'SCRIPT_API',
                     period: 'EVERY_10_MINUTES',
                     monitoredUrl: null,
-                    tags: [
-                      { key: 'team', values: ['backend'] }
-                    ]
-                  }
-                ]
-              }
-            }
-          }
-        }
-      })
+                    tags: [{ key: 'team', values: ['backend'] }],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('List synthetics monitors successfully', () => {
     it('should return a list of monitors with required fields', async () => {
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      const result = await syntheticsTool.listSyntheticsMonitors({ 
-        target_account_id: '123456'
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+      const result = await syntheticsTool.listSyntheticsMonitors({
+        target_account_id: '123456',
       });
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(2);
-      
+
       result.forEach((monitor: any) => {
         expect(monitor).toHaveProperty('guid');
         expect(monitor).toHaveProperty('name');
@@ -73,11 +71,13 @@ describe('Synthetics Monitors Feature', () => {
 
   describe('Filter monitors by type', () => {
     it('should filter monitors by monitor type', async () => {
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      
-      await syntheticsTool.listSyntheticsMonitors({ 
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+
+      await syntheticsTool.listSyntheticsMonitors({
         target_account_id: '123456',
-        monitor_type: 'SIMPLE'
+        monitor_type: 'SIMPLE',
       });
 
       expect(mockClient.executeNerdGraphQuery).toHaveBeenCalled();
@@ -88,9 +88,11 @@ describe('Synthetics Monitors Feature', () => {
 
   describe('Monitor types validation', () => {
     it('should return valid monitor types', async () => {
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      const result = await syntheticsTool.listSyntheticsMonitors({ 
-        target_account_id: '123456'
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+      const result = await syntheticsTool.listSyntheticsMonitors({
+        target_account_id: '123456',
       });
 
       const validTypes = ['SIMPLE', 'BROWSER', 'SCRIPT_API', 'SCRIPT_BROWSER'];
@@ -102,9 +104,11 @@ describe('Synthetics Monitors Feature', () => {
 
   describe('Monitor frequency periods', () => {
     it('should return valid frequency periods', async () => {
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      const result = await syntheticsTool.listSyntheticsMonitors({ 
-        target_account_id: '123456'
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+      const result = await syntheticsTool.listSyntheticsMonitors({
+        target_account_id: '123456',
       });
 
       const validPeriods = [
@@ -116,9 +120,9 @@ describe('Synthetics Monitors Feature', () => {
         'EVERY_HOUR',
         'EVERY_6_HOURS',
         'EVERY_12_HOURS',
-        'EVERY_DAY'
+        'EVERY_DAY',
       ];
-      
+
       result.forEach((monitor: any) => {
         expect(validPeriods).toContain(monitor.period);
       });
@@ -135,20 +139,22 @@ describe('Synthetics Monitors Feature', () => {
               name: 'New Monitor',
               uri: 'https://newsite.com',
               period: 'EVERY_5_MINUTES',
-              status: 'ENABLED'
+              status: 'ENABLED',
             },
-            errors: []
-          }
-        }
+            errors: [],
+          },
+        },
       });
 
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
       const result = await syntheticsTool.createBrowserMonitor({
         name: 'New Monitor',
         url: 'https://newsite.com',
         frequency: 5,
         locations: ['US_EAST_1', 'EU_WEST_1'],
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result).toBeDefined();
@@ -165,36 +171,40 @@ describe('Synthetics Monitors Feature', () => {
         data: {
           syntheticsCreateSimpleBrowserMonitor: {
             monitor: null,
-            errors: [
-              { type: 'VALIDATION_ERROR', description: 'Invalid URL format' }
-            ]
-          }
-        }
+            errors: [{ type: 'VALIDATION_ERROR', description: 'Invalid URL format' }],
+          },
+        },
       });
 
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      
-      await expect(syntheticsTool.createBrowserMonitor({
-        name: 'Bad Monitor',
-        url: 'invalid-url',
-        frequency: 5,
-        locations: ['US_EAST_1'],
-        target_account_id: '123456'
-      })).rejects.toThrow('Failed to create monitor: Invalid URL format');
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+
+      await expect(
+        syntheticsTool.createBrowserMonitor({
+          name: 'Bad Monitor',
+          url: 'invalid-url',
+          frequency: 5,
+          locations: ['US_EAST_1'],
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Failed to create monitor: Invalid URL format');
     });
   });
 
   describe('Monitor locations validation', () => {
     it('should validate monitor locations', async () => {
-      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(mockClient);
-      
+      const syntheticsTool = new (await import('../../../src/tools/synthetics')).SyntheticsTool(
+        mockClient
+      );
+
       const validLocations = [
         'US_EAST_1',
         'US_WEST_1',
         'EU_WEST_1',
         'EU_CENTRAL_1',
         'AP_SOUTHEAST_1',
-        'AP_NORTHEAST_1'
+        'AP_NORTHEAST_1',
       ];
 
       // The tool should accept valid location codes
@@ -203,7 +213,7 @@ describe('Synthetics Monitors Feature', () => {
         url: 'https://example.com',
         frequency: 5,
         locations: validLocations.slice(0, 2),
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(mockClient.executeNerdGraphQuery).toHaveBeenCalled();

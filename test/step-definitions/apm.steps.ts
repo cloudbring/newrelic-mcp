@@ -1,4 +1,4 @@
-import { Given, When, Then } from '@amiceli/vitest-cucumber';
+import { Given, Then, When } from '@amiceli/vitest-cucumber';
 import { expect, vi } from 'vitest';
 import { context, resetContext } from './shared.steps';
 
@@ -6,7 +6,7 @@ let targetAccountId: string = '';
 
 Given('I have access to APM applications in my account', () => {
   if (!context.mockClient) return;
-  
+
   context.mockClient.listApmApplications = vi.fn().mockResolvedValue([
     {
       guid: 'app-guid-1',
@@ -14,7 +14,7 @@ Given('I have access to APM applications in my account', () => {
       language: 'nodejs',
       reporting: true,
       alertSeverity: 'NOT_ALERTING',
-      tags: { env: 'production' }
+      tags: { env: 'production' },
     },
     {
       guid: 'app-guid-2',
@@ -22,8 +22,8 @@ Given('I have access to APM applications in my account', () => {
       language: 'java',
       reporting: true,
       alertSeverity: 'WARNING',
-      tags: { env: 'staging' }
-    }
+      tags: { env: 'staging' },
+    },
   ]);
 });
 
@@ -42,9 +42,9 @@ Given('I provide an invalid account ID', () => {
 
 Given('the New Relic API returns an error for the APM applications query', () => {
   if (!context.mockClient) return;
-  context.mockClient.listApmApplications = vi.fn().mockRejectedValue(
-    new Error('API Error: Rate limit exceeded')
-  );
+  context.mockClient.listApmApplications = vi
+    .fn()
+    .mockRejectedValue(new Error('API Error: Rate limit exceeded'));
 });
 
 Given('I have access to APM applications in multiple accounts', () => {
@@ -59,7 +59,7 @@ Given('there are more than 250 APM applications in the account', () => {
     language: 'nodejs',
     reporting: true,
     alertSeverity: 'NOT_ALERTING',
-    tags: {}
+    tags: {},
   }));
   context.mockClient.listApmApplications = vi.fn().mockResolvedValue(apps);
 });
@@ -67,24 +67,24 @@ Given('there are more than 250 APM applications in the account', () => {
 When('I call the {string} tool with a target account ID', async (toolName: string) => {
   resetContext();
   context.toolName = toolName;
-  
+
   if (!context.server) {
     const { NewRelicMCPServer } = await import('../../src/server');
     const { NewRelicClient } = await import('../../src/client/newrelic-client');
-    
+
     context.mockClient = {
       validateCredentials: vi.fn().mockResolvedValue(true),
       getAccountDetails: vi.fn().mockResolvedValue({ accountId: '123456', name: 'Test Account' }),
       listApmApplications: vi.fn().mockResolvedValue([]),
-      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} })
+      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} }),
     } as any;
-    
+
     context.server = new NewRelicMCPServer(context.mockClient);
   }
-  
+
   try {
     context.lastResponse = await context.server.executeTool(toolName, {
-      target_account_id: targetAccountId || context.accountId
+      target_account_id: targetAccountId || context.accountId,
     });
     context.lastError = null;
   } catch (error: any) {
@@ -204,9 +204,7 @@ Then('each application should include language information', () => {
 });
 
 Then('the response should contain applications from the default account', () => {
-  expect(context.mockClient?.listApmApplications).toHaveBeenCalledWith(
-    expect.any(String)
-  );
+  expect(context.mockClient?.listApmApplications).toHaveBeenCalledWith(expect.any(String));
 });
 
 Then('the search should be limited to the configured account', () => {
@@ -222,7 +220,11 @@ Then('the response should include pagination information', () => {
 
 Then('the response should include a nextCursor if applicable', () => {
   // Pagination cursor handling
-  if (context.lastResponse && Array.isArray(context.lastResponse) && context.lastResponse.length >= 250) {
+  if (
+    context.lastResponse &&
+    Array.isArray(context.lastResponse) &&
+    context.lastResponse.length >= 250
+  ) {
     // In a real implementation, this would check for pagination metadata
     expect(true).toBe(true);
   }
@@ -256,7 +258,7 @@ Then('the language should be a valid programming language', () => {
   }
 });
 
-Then('the language should reflect the application\'s technology stack', () => {
+Then("the language should reflect the application's technology stack", () => {
   // This is validated by the language field being present
   expect(true).toBe(true);
 });

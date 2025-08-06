@@ -1,7 +1,7 @@
-import { evalite } from 'evalite';
 import { Levenshtein } from 'autoevals';
-import { NewRelicMCPServer } from '../../src/server';
+import { evalite } from 'evalite';
 import { vi } from 'vitest';
+import { NewRelicMCPServer } from '../../src/server';
 
 const createMockClient = () => ({
   validateCredentials: vi.fn().mockResolvedValue(true),
@@ -13,7 +13,7 @@ const createMockClient = () => ({
       language: 'nodejs',
       reporting: true,
       alertSeverity: 'NOT_ALERTING',
-      tags: { environment: 'production', team: 'backend' }
+      tags: { environment: 'production', team: 'backend' },
     },
     {
       guid: 'app-2',
@@ -21,10 +21,10 @@ const createMockClient = () => ({
       language: 'java',
       reporting: false,
       alertSeverity: 'WARNING',
-      tags: { environment: 'staging', team: 'backend' }
-    }
+      tags: { environment: 'staging', team: 'backend' },
+    },
   ]),
-  executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} })
+  executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} }),
 });
 
 evalite('APM Applications Tool Response Validation', {
@@ -32,7 +32,7 @@ evalite('APM Applications Tool Response Validation', {
     {
       input: {
         tool: 'list_apm_applications',
-        params: { target_account_id: '123456' }
+        params: { target_account_id: '123456' },
       },
       expected: JSON.stringify([
         {
@@ -41,7 +41,7 @@ evalite('APM Applications Tool Response Validation', {
           language: 'nodejs',
           reporting: true,
           alertSeverity: 'NOT_ALERTING',
-          tags: { environment: 'production', team: 'backend' }
+          tags: { environment: 'production', team: 'backend' },
         },
         {
           guid: 'app-2',
@@ -49,28 +49,28 @@ evalite('APM Applications Tool Response Validation', {
           language: 'java',
           reporting: false,
           alertSeverity: 'WARNING',
-          tags: { environment: 'staging', team: 'backend' }
-        }
-      ])
+          tags: { environment: 'staging', team: 'backend' },
+        },
+      ]),
     },
     {
       input: {
         tool: 'list_apm_applications',
-        params: { target_account_id: '999999' }
+        params: { target_account_id: '999999' },
       },
-      expected: JSON.stringify([])
-    }
+      expected: JSON.stringify([]),
+    },
   ],
   task: async (input) => {
     const mockClient = createMockClient() as any;
-    
+
     // Adjust mock for different account IDs
     if (input.params.target_account_id === '999999') {
       mockClient.listApmApplications = vi.fn().mockResolvedValue([]);
     }
-    
+
     const server = new NewRelicMCPServer(mockClient);
-    
+
     try {
       const result = await server.executeTool(input.tool, input.params);
       return JSON.stringify(result);
@@ -86,17 +86,17 @@ evalite('APM Applications Tool Response Validation', {
       scorer: ({ output }) => {
         try {
           const parsed = JSON.parse(output);
-          
+
           if (!Array.isArray(parsed)) return 0;
           if (parsed.length === 0) return 1; // Empty array is valid
-          
+
           let score = 0;
           const requiredFields = ['guid', 'name', 'language', 'reporting'];
-          
+
           parsed.forEach((app: any) => {
-            const fieldScore = requiredFields.every(field => field in app) ? 0.25 : 0;
+            const fieldScore = requiredFields.every((field) => field in app) ? 0.25 : 0;
             score += fieldScore;
-            
+
             // Check field types
             if (typeof app.guid === 'string') score += 0.1;
             if (typeof app.name === 'string') score += 0.1;
@@ -104,12 +104,12 @@ evalite('APM Applications Tool Response Validation', {
             if (typeof app.reporting === 'boolean') score += 0.1;
             if (typeof app.tags === 'object') score += 0.1;
           });
-          
+
           return Math.min(score / parsed.length, 1);
         } catch {
           return 0;
         }
-      }
+      },
     },
     {
       name: 'Language Validation',
@@ -119,21 +119,30 @@ evalite('APM Applications Tool Response Validation', {
           const parsed = JSON.parse(output);
           if (!Array.isArray(parsed)) return 0;
           if (parsed.length === 0) return 1;
-          
-          const validLanguages = ['nodejs', 'java', 'python', 'ruby', 'go', 'dotnet', 'php', 'unknown'];
+
+          const validLanguages = [
+            'nodejs',
+            'java',
+            'python',
+            'ruby',
+            'go',
+            'dotnet',
+            'php',
+            'unknown',
+          ];
           let validCount = 0;
-          
+
           parsed.forEach((app: any) => {
             if (validLanguages.includes(app.language?.toLowerCase())) {
               validCount++;
             }
           });
-          
+
           return validCount / parsed.length;
         } catch {
           return 0;
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 });

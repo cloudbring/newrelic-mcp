@@ -1,5 +1,5 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { NewRelicClient } from '../client/newrelic-client';
 
 export class AlertTool {
   private client: NewRelicClient;
@@ -17,10 +17,10 @@ export class AlertTool {
         properties: {
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
-          }
-        }
-      }
+            description: 'Optional New Relic account ID',
+          },
+        },
+      },
     };
   }
 
@@ -33,15 +33,15 @@ export class AlertTool {
         properties: {
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
+            description: 'Optional New Relic account ID',
           },
           priority: {
             type: 'string',
             enum: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'],
-            description: 'Filter by incident priority'
-          }
-        }
-      }
+            description: 'Filter by incident priority',
+          },
+        },
+      },
     };
   }
 
@@ -54,11 +54,11 @@ export class AlertTool {
         properties: {
           incident_id: {
             type: 'string',
-            description: 'The ID of the incident to acknowledge'
-          }
+            description: 'The ID of the incident to acknowledge',
+          },
         },
-        required: ['incident_id']
-      }
+        required: ['incident_id'],
+      },
     };
   }
 
@@ -129,14 +129,14 @@ export class AlertTool {
 
     const response = await this.client.executeNerdGraphQuery(query);
     const entities = response.data?.actor?.entitySearch?.results?.entities || [];
-    
+
     const incidents: any[] = [];
     entities.forEach((entity: any) => {
       if (entity.issues?.issues) {
         incidents.push(...entity.issues.issues);
       }
     });
-    
+
     return incidents;
   }
 
@@ -164,11 +164,11 @@ export class AlertTool {
 
     const response = await this.client.executeNerdGraphQuery(mutation);
     const result = response.data?.aiIssuesAcknowledge;
-    
+
     if (result?.errors && result.errors.length > 0) {
       throw new Error(result.errors[0].description);
     }
-    
+
     return result?.issues?.[0] || null;
   }
 
@@ -192,11 +192,11 @@ export class AlertTool {
 
     const response = await this.client.executeNerdGraphQuery(mutation);
     const result = response.data?.aiIssuesAcknowledge;
-    
+
     if (result?.errors && result.errors.length > 0) {
       throw new Error(result.errors[0].description);
     }
-    
+
     return result?.issues || [];
   }
 }

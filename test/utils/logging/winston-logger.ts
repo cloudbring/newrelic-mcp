@@ -1,12 +1,12 @@
+import path from 'node:path';
 import winston from 'winston';
-import path from 'path';
 
 // Custom format for New Relic compatibility
 const newRelicFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.errors({ stack: true }),
   winston.format.metadata({
-    fillExcept: ['message', 'level', 'timestamp', 'label']
+    fillExcept: ['message', 'level', 'timestamp', 'label'],
   }),
   winston.format.json()
 );
@@ -37,7 +37,7 @@ const createLogger = (serviceName: string = 'newrelic-mcp') => {
       new winston.transports.Console({
         format: consoleFormat,
         level: isTest ? 'error' : 'debug',
-        silent: process.env.SUPPRESS_LOGS === 'true'
+        silent: process.env.SUPPRESS_LOGS === 'true',
       })
     );
   }
@@ -50,7 +50,7 @@ const createLogger = (serviceName: string = 'newrelic-mcp') => {
         level: 'error',
         format: newRelicFormat,
         maxsize: 5242880, // 5MB
-        maxFiles: 5
+        maxFiles: 5,
       })
     );
 
@@ -59,7 +59,7 @@ const createLogger = (serviceName: string = 'newrelic-mcp') => {
         filename: path.join(process.cwd(), 'logs', 'combined.log'),
         format: newRelicFormat,
         maxsize: 5242880, // 5MB
-        maxFiles: 5
+        maxFiles: 5,
       })
     );
   }
@@ -67,13 +67,13 @@ const createLogger = (serviceName: string = 'newrelic-mcp') => {
   return winston.createLogger({
     level: process.env.LOG_LEVEL || (isTest ? 'error' : 'info'),
     format: newRelicFormat,
-    defaultMeta: { 
+    defaultMeta: {
       service: serviceName,
       environment: process.env.NODE_ENV || 'development',
-      accountId: process.env.NEW_RELIC_ACCOUNT_ID
+      accountId: process.env.NEW_RELIC_ACCOUNT_ID,
     },
     transports,
-    exitOnError: false
+    exitOnError: false,
   });
 };
 
@@ -89,19 +89,29 @@ export const logger = createLogger();
 export { createLogger };
 
 // Helper functions for structured logging
-export const logRequest = (logger: winston.Logger, method: string, path: string, metadata?: any) => {
+export const logRequest = (
+  logger: winston.Logger,
+  method: string,
+  path: string,
+  metadata?: any
+) => {
   logger.info('Request received', {
     method,
     path,
-    ...metadata
+    ...metadata,
   });
 };
 
-export const logResponse = (logger: winston.Logger, statusCode: number, duration: number, metadata?: any) => {
+export const logResponse = (
+  logger: winston.Logger,
+  statusCode: number,
+  duration: number,
+  metadata?: any
+) => {
   logger.info('Response sent', {
     statusCode,
     duration,
-    ...metadata
+    ...metadata,
   });
 };
 
@@ -110,20 +120,26 @@ export const logError = (logger: winston.Logger, error: Error, context?: any) =>
     error: {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
     },
-    ...context
+    ...context,
   });
 };
 
-export const logMetric = (logger: winston.Logger, metricName: string, value: number, unit: string, metadata?: any) => {
+export const logMetric = (
+  logger: winston.Logger,
+  metricName: string,
+  value: number,
+  unit: string,
+  metadata?: any
+) => {
   logger.info('Metric recorded', {
     metric: {
       name: metricName,
       value,
-      unit
+      unit,
     },
-    ...metadata
+    ...metadata,
   });
 };
 
@@ -132,8 +148,6 @@ export const createTestLogger = () => {
   return winston.createLogger({
     level: 'error',
     format: winston.format.simple(),
-    transports: [
-      new winston.transports.Console({ silent: true })
-    ]
+    transports: [new winston.transports.Console({ silent: true })],
   });
 };

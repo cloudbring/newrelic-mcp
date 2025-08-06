@@ -1,4 +1,4 @@
-import { test as base, vi, expect } from 'vitest';
+import { test as base, expect, vi } from 'vitest';
 import winston from 'winston';
 import { getTestTracer } from '../utils/instrumentation/otel-setup';
 
@@ -39,7 +39,6 @@ export interface LoggingFixtures {
 // Create custom Winston transport for capturing logs
 class CaptureTransport extends winston.transports.Stream {
   private captures: LogCapture['logs'] = [];
-  private stream: any;
 
   constructor() {
     const stream = {
@@ -61,7 +60,7 @@ class CaptureTransport extends winston.transports.Stream {
         }
       },
     };
-    
+
     super({ stream });
     this.stream = stream;
   }
@@ -79,7 +78,7 @@ class CaptureTransport extends winston.transports.Stream {
 class CaptureSpanProcessor {
   private captures: SpanCapture['spans'] = [];
 
-  onStart(span: any): void {
+  onStart(_span: any): void {
     // Capture span start
   }
 
@@ -117,10 +116,7 @@ export const test = base.extend<LoggingFixtures>({
     const captureTransport = new CaptureTransport();
     const logger = winston.createLogger({
       level: 'debug',
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-      ),
+      format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       transports: [captureTransport],
     });
 
@@ -129,64 +125,56 @@ export const test = base.extend<LoggingFixtures>({
 
   logCapture: async ({ logger }, use) => {
     const transport = logger.transports[0] as CaptureTransport;
-    
+
     const capture: LogCapture = {
       get logs() {
         return transport.getCaptures();
       },
       clear: () => transport.clear(),
       findByMessage: (message: string) => {
-        return transport.getCaptures().filter(log => 
-          log.message.includes(message)
-        );
+        return transport.getCaptures().filter((log) => log.message.includes(message));
       },
       findByLevel: (level: string) => {
-        return transport.getCaptures().filter(log => 
-          log.level === level
-        );
+        return transport.getCaptures().filter((log) => log.level === level);
       },
       hasLog: (level: string, message: string) => {
-        return transport.getCaptures().some(log => 
-          log.level === level && log.message.includes(message)
-        );
+        return transport
+          .getCaptures()
+          .some((log) => log.level === level && log.message.includes(message));
       },
     };
 
     await use(capture);
-    
+
     // Clear logs after each test
     transport.clear();
   },
 
   spanCapture: async ({}, use) => {
     const processor = new CaptureSpanProcessor();
-    
+
     const capture: SpanCapture = {
       get spans() {
         return processor.getCaptures();
       },
       clear: () => processor.clear(),
       findByName: (name: string) => {
-        return processor.getCaptures().filter(span => 
-          span.name.includes(name)
-        );
+        return processor.getCaptures().filter((span) => span.name.includes(name));
       },
       findByAttribute: (key: string, value: any) => {
-        return processor.getCaptures().filter(span => 
-          span.attributes[key] === value
-        );
+        return processor.getCaptures().filter((span) => span.attributes[key] === value);
       },
     };
 
     await use(capture);
-    
+
     // Clear spans after each test
     processor.clear();
   },
 
   withSpan: async ({}, use) => {
     const tracer = getTestTracer();
-    
+
     const withSpan = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {
       return tracer.startActiveSpan(name, async (span) => {
         try {
@@ -194,9 +182,9 @@ export const test = base.extend<LoggingFixtures>({
           span.setStatus({ code: 1 }); // OK
           return result;
         } catch (error) {
-          span.setStatus({ 
+          span.setStatus({
             code: 2, // ERROR
-            message: error instanceof Error ? error.message : 'Unknown error'
+            message: error instanceof Error ? error.message : 'Unknown error',
           });
           span.recordException(error as Error);
           throw error;
@@ -211,19 +199,14 @@ export const test = base.extend<LoggingFixtures>({
 });
 
 // Export utilities for use in tests
-export { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+export { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 // Helper to create a test logger with specific configuration
 export const createConfiguredTestLogger = (config?: Partial<winston.LoggerOptions>) => {
   return winston.createLogger({
     level: 'debug',
-    format: winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.json()
-    ),
-    transports: [
-      new winston.transports.Console({ silent: true })
-    ],
+    format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+    transports: [new winston.transports.Console({ silent: true })],
     ...config,
   });
 };
@@ -249,11 +232,14 @@ export const expectSpanAttributes = (span: any, expected: Record<string, any>) =
 };
 
 // Helper to verify log structure
-export const expectLogStructure = (log: any, expected: {
-  level?: string;
-  message?: string;
-  [key: string]: any;
-}) => {
+export const expectLogStructure = (
+  log: any,
+  expected: {
+    level?: string;
+    message?: string;
+    [key: string]: any;
+  }
+) => {
   if (expected.level) {
     expect(log.level).toBe(expected.level);
   }

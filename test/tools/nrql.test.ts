@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../src/client/newrelic-client';
 import { NrqlTool } from '../../src/tools/nrql';
-import { NewRelicClient } from '../../src/client/newrelic-client';
 
 describe('NRQL Query Tool', () => {
   let tool: NrqlTool;
@@ -10,7 +10,7 @@ describe('NRQL Query Tool', () => {
     mockClient = {
       runNrqlQuery: vi.fn(),
     } as any;
-    
+
     tool = new NrqlTool(mockClient);
   });
 
@@ -35,75 +35,81 @@ describe('NRQL Query Tool', () => {
         results: [{ count: 100 }],
         metadata: {
           eventTypes: ['Transaction'],
-          timeWindow: { begin: 1234567890, end: 1234567900 }
-        }
+          timeWindow: { begin: 1234567890, end: 1234567900 },
+        },
       };
-      
+
       mockClient.runNrqlQuery.mockResolvedValue(mockResults);
-      
+
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
-      
+
       expect(result).toEqual(mockResults);
       expect(mockClient.runNrqlQuery).toHaveBeenCalledWith({
         nrql: 'SELECT count(*) FROM Transaction',
-        accountId: '123456'
+        accountId: '123456',
       });
     });
 
     it('should reject empty NRQL query', async () => {
-      await expect(tool.execute({
-        nrql: '',
-        target_account_id: '123456'
-      })).rejects.toThrow('Invalid or empty NRQL query provided');
+      await expect(
+        tool.execute({
+          nrql: '',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Invalid or empty NRQL query provided');
     });
 
     it('should reject null NRQL query', async () => {
-      await expect(tool.execute({
-        nrql: null as any,
-        target_account_id: '123456'
-      })).rejects.toThrow('Invalid or empty NRQL query provided');
+      await expect(
+        tool.execute({
+          nrql: null as any,
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Invalid or empty NRQL query provided');
     });
 
     it('should require account ID', async () => {
-      await expect(tool.execute({
-        nrql: 'SELECT count(*) FROM Transaction'
-      })).rejects.toThrow('Account ID must be provided');
+      await expect(
+        tool.execute({
+          nrql: 'SELECT count(*) FROM Transaction',
+        })
+      ).rejects.toThrow('Account ID must be provided');
     });
 
     it('should handle NRQL syntax errors', async () => {
-      mockClient.runNrqlQuery.mockRejectedValue(
-        new Error('NRQL Syntax error: invalid query')
-      );
-      
-      await expect(tool.execute({
-        nrql: 'SELEKT count(*) FROM Transaction',
-        target_account_id: '123456'
-      })).rejects.toThrow('Syntax error');
+      mockClient.runNrqlQuery.mockRejectedValue(new Error('NRQL Syntax error: invalid query'));
+
+      await expect(
+        tool.execute({
+          nrql: 'SELEKT count(*) FROM Transaction',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Syntax error');
     });
 
     it('should handle time series queries', async () => {
       const mockResults = {
         results: [
           { timestamp: 1234567890, count: 100 },
-          { timestamp: 1234567900, count: 110 }
+          { timestamp: 1234567900, count: 110 },
         ],
         metadata: {
           eventTypes: ['Transaction'],
           timeWindow: { begin: 1234567890, end: 1234567900 },
-          timeSeries: true
-        }
+          timeSeries: true,
+        },
       };
-      
+
       mockClient.runNrqlQuery.mockResolvedValue(mockResults);
-      
+
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction TIMESERIES',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
-      
+
       expect(result.metadata.timeSeries).toBe(true);
       expect(result.results).toHaveLength(2);
     });
@@ -112,21 +118,21 @@ describe('NRQL Query Tool', () => {
       const mockResults = {
         results: [
           { facet: 'web', count: 100 },
-          { facet: 'mobile', count: 50 }
+          { facet: 'mobile', count: 50 },
         ],
         metadata: {
           facets: ['appName'],
-          eventTypes: ['Transaction']
-        }
+          eventTypes: ['Transaction'],
+        },
       };
-      
+
       mockClient.runNrqlQuery.mockResolvedValue(mockResults);
-      
+
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction FACET appName',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
-      
+
       expect(result.metadata.facets).toContain('appName');
       expect(result.results).toHaveLength(2);
     });
@@ -135,18 +141,22 @@ describe('NRQL Query Tool', () => {
   describe('Error Handling', () => {
     it('should handle API errors gracefully', async () => {
       mockClient.runNrqlQuery.mockRejectedValue(new Error('API Error: Rate limit exceeded'));
-      
-      await expect(tool.execute({
-        nrql: 'SELECT count(*) FROM Transaction',
-        target_account_id: '123456'
-      })).rejects.toThrow('API Error: Rate limit exceeded');
+
+      await expect(
+        tool.execute({
+          nrql: 'SELECT count(*) FROM Transaction',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('API Error: Rate limit exceeded');
     });
 
     it('should validate account ID format', async () => {
-      await expect(tool.execute({
-        nrql: 'SELECT count(*) FROM Transaction',
-        target_account_id: 'invalid-id'
-      })).rejects.toThrow('Invalid account ID format');
+      await expect(
+        tool.execute({
+          nrql: 'SELECT count(*) FROM Transaction',
+          target_account_id: 'invalid-id',
+        })
+      ).rejects.toThrow('Invalid account ID format');
     });
   });
 });

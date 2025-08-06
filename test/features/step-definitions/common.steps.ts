@@ -1,7 +1,7 @@
-import { Given, When, Then } from '@amiceli/vitest-cucumber';
+import { Given, Then, When } from '@amiceli/vitest-cucumber';
 import { expect, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 let server: NewRelicMCPServer;
 let mockClient: NewRelicClient;
@@ -14,12 +14,12 @@ Given('the MCP server is running', () => {
     getAccountDetails: vi.fn().mockResolvedValue({ accountId: '123456', name: 'Test Account' }),
     runNrqlQuery: vi.fn(),
     listApmApplications: vi.fn(),
-    executeNerdGraphQuery: vi.fn()
+    executeNerdGraphQuery: vi.fn(),
   } as any;
-  
+
   process.env.NEW_RELIC_API_KEY = 'test-api-key';
   process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-  
+
   server = new NewRelicMCPServer(mockClient);
 });
 
@@ -53,7 +53,7 @@ When('I call the {string} tool with the query', async (toolName: string) => {
   try {
     lastResponse = await server.executeTool(toolName, {
       nrql: 'SELECT count(*) FROM Transaction TIMESERIES',
-      target_account_id: '123456'
+      target_account_id: '123456',
     });
     lastError = null;
   } catch (error) {
@@ -65,7 +65,7 @@ When('I call the {string} tool with the query', async (toolName: string) => {
 When('I call the {string} tool with a target account ID', async (toolName: string) => {
   try {
     lastResponse = await server.executeTool(toolName, {
-      target_account_id: '789012'
+      target_account_id: '789012',
     });
     lastError = null;
   } catch (error) {

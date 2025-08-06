@@ -1,5 +1,5 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { NewRelicClient } from '../client/newrelic-client';
 
 export class SyntheticsTool {
   private client: NewRelicClient;
@@ -17,15 +17,15 @@ export class SyntheticsTool {
         properties: {
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
+            description: 'Optional New Relic account ID',
           },
           monitor_type: {
             type: 'string',
             enum: ['SIMPLE', 'BROWSER', 'SCRIPT_API', 'SCRIPT_BROWSER'],
-            description: 'Filter by monitor type'
-          }
-        }
-      }
+            description: 'Filter by monitor type',
+          },
+        },
+      },
     };
   }
 
@@ -38,29 +38,29 @@ export class SyntheticsTool {
         properties: {
           name: {
             type: 'string',
-            description: 'Name of the monitor'
+            description: 'Name of the monitor',
           },
           url: {
             type: 'string',
-            description: 'URL to monitor'
+            description: 'URL to monitor',
           },
           frequency: {
             type: 'number',
             enum: [1, 5, 10, 15, 30, 60],
-            description: 'Check frequency in minutes'
+            description: 'Check frequency in minutes',
           },
           locations: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Location codes for monitoring'
+            description: 'Location codes for monitoring',
           },
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
-          }
+            description: 'Optional New Relic account ID',
+          },
         },
-        required: ['name', 'url', 'frequency', 'locations']
-      }
+        required: ['name', 'url', 'frequency', 'locations'],
+      },
     };
   }
 
@@ -138,11 +138,11 @@ export class SyntheticsTool {
 
     const response = await this.client.executeNerdGraphQuery(mutation);
     const result = response.data?.syntheticsCreateSimpleBrowserMonitor;
-    
+
     if (result?.errors && result.errors.length > 0) {
       throw new Error(`Failed to create monitor: ${result.errors[0].description}`);
     }
-    
+
     return result?.monitor || null;
   }
 
@@ -153,7 +153,7 @@ export class SyntheticsTool {
       10: 'EVERY_10_MINUTES',
       15: 'EVERY_15_MINUTES',
       30: 'EVERY_30_MINUTES',
-      60: 'EVERY_HOUR'
+      60: 'EVERY_HOUR',
     };
     return periodMap[frequency] || 'EVERY_5_MINUTES';
   }

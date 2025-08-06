@@ -1,9 +1,12 @@
 {
   "name": "newrelic-mcp",
   "version": "1.0.0",
-  "description": "MCP server for New Relic observability platform integration",
-  "author": "Your Name",
-  "license": "ISC",
+  "description": "Model Context Protocol server for New Relic observability platform - query metrics, manage alerts, monitor applications",
+  "author": "New Relic MCP Contributors",
+  "license": "MIT",
+  "repository": "https://github.com/qai-run/newrelic-mcp",
+  "homepage": "https://github.com/qai-run/newrelic-mcp#readme",
+  "tags": ["newrelic", "observability", "monitoring", "apm", "alerts", "nrql"],
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",

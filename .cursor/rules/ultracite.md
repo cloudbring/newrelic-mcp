@@ -23,6 +23,7 @@
 ## Project-Specific Guidelines
 
 ### MCP Server Development
+
 - Follow Model Context Protocol specifications
 - Use proper error handling with descriptive error messages
 - Implement proper input validation using Zod schemas
@@ -30,6 +31,7 @@
 - Document all tools with clear descriptions
 
 ### New Relic Integration
+
 - Never expose API keys or sensitive credentials in code
 - Use environment variables for all configuration
 - Validate all NRQL queries before execution
@@ -37,6 +39,7 @@
 - Use the NewRelicClient class for all API interactions
 
 ### Testing Practices
+
 - Write tests using Vitest
 - Use BDD features with Gherkin syntax
 - Maintain test coverage above 90%

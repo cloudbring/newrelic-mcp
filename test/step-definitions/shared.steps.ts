@@ -1,5 +1,5 @@
-import { Given, When, Then } from '@amiceli/vitest-cucumber';
-import { expect, vi } from 'vitest';
+import { Given, Then } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
 
 // Shared context for all tests
 export interface TestContext {

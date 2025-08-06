@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NewRelicClient } from '../../src/client/newrelic-client';
 
 // Mock fetch globally
@@ -35,11 +35,11 @@ describe('NewRelicClient', () => {
             actor: {
               user: {
                 id: 'user-123',
-                email: 'test@example.com'
-              }
-            }
-          }
-        })
+                email: 'test@example.com',
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.validateCredentials();
@@ -49,7 +49,7 @@ describe('NewRelicClient', () => {
     it('should return false for invalid credentials', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
-        status: 401
+        status: 401,
       });
 
       const result = await client.validateCredentials();
@@ -66,11 +66,11 @@ describe('NewRelicClient', () => {
             actor: {
               account: {
                 id: '123456',
-                name: 'Test Account'
-              }
-            }
-          }
-        })
+                name: 'Test Account',
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.getAccountDetails('123456');
@@ -83,13 +83,12 @@ describe('NewRelicClient', () => {
         ok: true,
         json: async () => ({
           data: {
-            actor: {}
-          }
-        })
+            actor: {},
+          },
+        }),
       });
 
-      await expect(client.getAccountDetails('999999'))
-        .rejects.toThrow('Account 999999 not found');
+      await expect(client.getAccountDetails('999999')).rejects.toThrow('Account 999999 not found');
     });
 
     it('should use default account ID when not provided', async () => {
@@ -100,11 +99,11 @@ describe('NewRelicClient', () => {
             actor: {
               account: {
                 id: '123456',
-                name: 'Default Account'
-              }
-            }
-          }
-        })
+                name: 'Default Account',
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.getAccountDetails();
@@ -125,18 +124,18 @@ describe('NewRelicClient', () => {
                   metadata: {
                     eventTypes: ['Transaction'],
                     facets: [],
-                    timeSeries: false
-                  }
-                }
-              }
-            }
-          }
-        })
+                    timeSeries: false,
+                  },
+                },
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.runNrqlQuery({
         nrql: 'SELECT count(*) FROM Transaction',
-        accountId: '123456'
+        accountId: '123456',
       });
 
       expect(result.results).toEqual([{ count: 100 }]);
@@ -144,33 +143,41 @@ describe('NewRelicClient', () => {
     });
 
     it('should validate NRQL query input', async () => {
-      await expect(client.runNrqlQuery({
-        nrql: '',
-        accountId: '123456'
-      })).rejects.toThrow('Invalid or empty NRQL query provided');
+      await expect(
+        client.runNrqlQuery({
+          nrql: '',
+          accountId: '123456',
+        })
+      ).rejects.toThrow('Invalid or empty NRQL query provided');
     });
 
     it('should validate account ID format', async () => {
-      await expect(client.runNrqlQuery({
-        nrql: 'SELECT * FROM Transaction',
-        accountId: 'invalid'
-      })).rejects.toThrow('Invalid account ID format');
+      await expect(
+        client.runNrqlQuery({
+          nrql: 'SELECT * FROM Transaction',
+          accountId: 'invalid',
+        })
+      ).rejects.toThrow('Invalid account ID format');
     });
 
     it('should handle NRQL syntax errors', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          errors: [{
-            message: 'NRQL Syntax error: invalid query'
-          }]
-        })
+          errors: [
+            {
+              message: 'NRQL Syntax error: invalid query',
+            },
+          ],
+        }),
       });
 
-      await expect(client.runNrqlQuery({
-        nrql: 'INVALID QUERY',
-        accountId: '123456'
-      })).rejects.toThrow('NRQL Syntax error: invalid query');
+      await expect(
+        client.runNrqlQuery({
+          nrql: 'INVALID QUERY',
+          accountId: '123456',
+        })
+      ).rejects.toThrow('NRQL Syntax error: invalid query');
     });
   });
 
@@ -190,16 +197,14 @@ describe('NewRelicClient', () => {
                       language: 'Node.js',
                       reporting: true,
                       alertSeverity: 'NOT_ALERTING',
-                      tags: [
-                        { key: 'env', values: ['prod'] }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        })
+                      tags: [{ key: 'env', values: ['prod'] }],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.listApmApplications('123456');
@@ -217,12 +222,12 @@ describe('NewRelicClient', () => {
             actor: {
               entitySearch: {
                 results: {
-                  entities: []
-                }
-              }
-            }
-          }
-        })
+                  entities: [],
+                },
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.listApmApplications('123456');
@@ -235,8 +240,8 @@ describe('NewRelicClient', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
-          data: { result: 'success' }
-        })
+          data: { result: 'success' },
+        }),
       });
 
       const result = await client.executeNerdGraphQuery(
@@ -248,7 +253,7 @@ describe('NewRelicClient', () => {
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.newrelic.com/graphql',
         expect.objectContaining({
-          body: expect.stringContaining('variables')
+          body: expect.stringContaining('variables'),
         })
       );
     });
@@ -257,12 +262,13 @@ describe('NewRelicClient', () => {
       // Temporarily remove the env var to test missing API key scenario
       const originalApiKey = process.env.NEW_RELIC_API_KEY;
       delete process.env.NEW_RELIC_API_KEY;
-      
+
       const clientNoKey = new NewRelicClient('', '123456');
-      
-      await expect(clientNoKey.executeNerdGraphQuery('{ actor { user { id } } }'))
-        .rejects.toThrow('NEW_RELIC_API_KEY environment variable is not set');
-        
+
+      await expect(clientNoKey.executeNerdGraphQuery('{ actor { user { id } } }')).rejects.toThrow(
+        'NEW_RELIC_API_KEY environment variable is not set'
+      );
+
       // Restore the env var
       process.env.NEW_RELIC_API_KEY = originalApiKey;
     });
@@ -271,22 +277,24 @@ describe('NewRelicClient', () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 401,
-        statusText: 'Unauthorized'
+        statusText: 'Unauthorized',
       });
 
-      await expect(client.executeNerdGraphQuery('{ actor { user { id } } }'))
-        .rejects.toThrow('Unauthorized: Invalid API key');
+      await expect(client.executeNerdGraphQuery('{ actor { user { id } } }')).rejects.toThrow(
+        'Unauthorized: Invalid API key'
+      );
     });
 
     it('should handle other API errors', async () => {
       (global.fetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
       });
 
-      await expect(client.executeNerdGraphQuery('{ actor { user { id } } }'))
-        .rejects.toThrow('NerdGraph API error: 500 Internal Server Error');
+      await expect(client.executeNerdGraphQuery('{ actor { user { id } } }')).rejects.toThrow(
+        'NerdGraph API error: 500 Internal Server Error'
+      );
     });
   });
 
@@ -307,21 +315,21 @@ describe('NewRelicClient', () => {
                         { key: 'env', values: ['production', 'staging'] },
                         { key: 'team', values: ['backend'] },
                         { key: 'empty', values: [] },
-                        { key: null, values: ['ignored'] }
-                      ]
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        })
+                        { key: null, values: ['ignored'] },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.listApmApplications('123456');
       expect(result[0].tags).toEqual({
         env: 'production',
-        team: 'backend'
+        team: 'backend',
       });
     });
 
@@ -336,14 +344,14 @@ describe('NewRelicClient', () => {
                   entities: [
                     {
                       guid: 'entity-1',
-                      name: 'Entity 1'
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        })
+                      name: 'Entity 1',
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        }),
       });
 
       const result = await client.listApmApplications('123456');

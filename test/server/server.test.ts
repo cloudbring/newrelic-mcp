@@ -1,8 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../src/server';
-import { NewRelicClient } from '../../src/client/newrelic-client';
 
 describe('NewRelic MCP Server', () => {
   let server: NewRelicMCPServer;
@@ -14,9 +12,9 @@ describe('NewRelic MCP Server', () => {
       getAccountDetails: vi.fn().mockResolvedValue({ accountId: '123456', name: 'Test Account' }),
       runNrqlQuery: vi.fn().mockResolvedValue({ results: [], metadata: {} }),
       listApmApplications: vi.fn().mockResolvedValue([]),
-      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} })
+      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} }),
     } as any;
-    
+
     server = new NewRelicMCPServer(mockClient);
   });
 
@@ -35,7 +33,7 @@ describe('NewRelic MCP Server', () => {
 
     it('should register all required tools', () => {
       const tools = server.getRegisteredTools();
-      
+
       // Core tools that should be registered
       const expectedTools = [
         'list_apm_applications',
@@ -48,10 +46,10 @@ describe('NewRelic MCP Server', () => {
         'list_open_incidents',
         'acknowledge_incident',
         'list_synthetics_monitors',
-        'create_browser_monitor'
+        'create_browser_monitor',
       ];
 
-      expectedTools.forEach(toolName => {
+      expectedTools.forEach((toolName) => {
         expect(tools).toContain(toolName);
       });
     });
@@ -99,9 +97,9 @@ describe('NewRelic MCP Server', () => {
     it('should require NEW_RELIC_API_KEY environment variable', () => {
       const originalEnv = process.env.NEW_RELIC_API_KEY;
       delete process.env.NEW_RELIC_API_KEY;
-      
+
       expect(() => new NewRelicMCPServer()).toThrow('NEW_RELIC_API_KEY is required');
-      
+
       process.env.NEW_RELIC_API_KEY = originalEnv;
     });
 
@@ -112,11 +110,11 @@ describe('NewRelic MCP Server', () => {
     });
 
     it('should allow account ID override in tool calls', async () => {
-      const result = await server.executeTool('run_nrql_query', {
+      const _result = await server.executeTool('run_nrql_query', {
         nrql: 'SELECT count(*) FROM Transaction',
-        target_account_id: '999999'
+        target_account_id: '999999',
       });
-      
+
       expect(mockClient.runNrqlQuery).toHaveBeenCalledWith(
         expect.objectContaining({ accountId: '999999' })
       );

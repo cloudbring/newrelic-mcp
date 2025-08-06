@@ -1,5 +1,5 @@
-import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { performance } from 'perf_hooks';
+import { performance } from 'node:perf_hooks';
+import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
 // Conditionally import OpenTelemetry and logging modules
 let logger: any;
@@ -8,13 +8,13 @@ let initializeOpenTelemetry: any;
 let shutdownOpenTelemetry: any;
 let getTracer: any;
 let trace: any;
-let context: any;
+let _context: any;
 
 try {
   const loggerModule = await import('../utils/logging/winston-logger');
   logger = loggerModule.logger;
   createChildLogger = loggerModule.createChildLogger;
-} catch (error) {
+} catch (_error) {
   console.debug('Logger module not available, using console');
   logger = console;
   createChildLogger = () => console;
@@ -25,11 +25,11 @@ try {
   initializeOpenTelemetry = otelModule.initializeOpenTelemetry;
   shutdownOpenTelemetry = otelModule.shutdownOpenTelemetry;
   getTracer = otelModule.getTracer;
-  
+
   const apiModule = await import('@opentelemetry/api');
   trace = apiModule.trace;
-  context = apiModule.context;
-} catch (error) {
+  _context = apiModule.context;
+} catch (_error) {
   console.debug('OpenTelemetry modules not available');
 }
 
@@ -91,7 +91,7 @@ export const setupTestInstrumentation = () => {
 
     // Create test-specific logger
     const testLogger = createChildLogger(logger, `test:${testName}`);
-    
+
     // Start performance timing
     const startTime = performance.now();
 
@@ -134,13 +134,13 @@ export const setupTestInstrumentation = () => {
     const testName = context.task.name;
     const suiteName = context.task.suite?.name || 'default';
     const testKey = `${suiteName}:${testName}`;
-    
+
     const testContext = testContexts.get(testKey);
     if (!testContext) return;
 
     // Calculate test duration
     const duration = performance.now() - testContext.startTime;
-    
+
     // Determine test result
     const testResult = context.task.result?.state || 'unknown';
     const error = context.task.result?.errors?.[0];
@@ -151,17 +151,19 @@ export const setupTestInstrumentation = () => {
       suite: suiteName,
       result: testResult,
       duration: `${duration.toFixed(2)}ms`,
-      error: error ? {
-        message: error.message,
-        stack: error.stack,
-      } : undefined,
+      error: error
+        ? {
+            message: error.message,
+            stack: error.stack,
+          }
+        : undefined,
     });
 
     // Complete OpenTelemetry span
     if (testContext.span) {
       testContext.span.setAttribute('test.result', testResult);
       testContext.span.setAttribute('test.duration_ms', duration);
-      
+
       if (error) {
         testContext.span.recordException(error);
         testContext.span.setStatus({
@@ -171,7 +173,7 @@ export const setupTestInstrumentation = () => {
       } else {
         testContext.span.setStatus({ code: 1 }); // OK
       }
-      
+
       testContext.span.end();
     }
 
@@ -223,28 +225,28 @@ export const measureTestOperation = async <T>(
 ): Promise<T> => {
   const start = performance.now();
   const context = getCurrentTestContext();
-  
+
   try {
     const result = await fn();
     const duration = performance.now() - start;
-    
+
     if (context?.logger) {
       context.logger.debug(`Operation completed: ${operationName}`, {
         operation: operationName,
         duration: `${duration.toFixed(2)}ms`,
       });
     }
-    
+
     if (context?.span) {
       context.span.addEvent(`operation.${operationName}`, {
         duration_ms: duration,
       });
     }
-    
+
     return result;
   } catch (error) {
     const duration = performance.now() - start;
-    
+
     if (context?.logger) {
       context.logger.error(`Operation failed: ${operationName}`, {
         operation: operationName,
@@ -252,14 +254,14 @@ export const measureTestOperation = async <T>(
         error: error instanceof Error ? error.message : String(error),
       });
     }
-    
+
     if (context?.span) {
       context.span.addEvent(`operation.${operationName}.error`, {
         duration_ms: duration,
         error: error instanceof Error ? error.message : String(error),
       });
     }
-    
+
     throw error;
   }
 };

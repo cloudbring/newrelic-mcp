@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('Alert Policies Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -21,29 +21,27 @@ describe('Alert Policies Feature', () => {
                       id: 'policy-1',
                       name: 'Production Alert Policy',
                       incidentPreference: 'PER_POLICY',
-                      conditions: [
-                        { id: 'cond-1', name: 'High CPU', enabled: true }
-                      ]
+                      conditions: [{ id: 'cond-1', name: 'High CPU', enabled: true }],
                     },
                     {
                       id: 'policy-2',
                       name: 'Staging Alert Policy',
                       incidentPreference: 'PER_CONDITION',
-                      conditions: []
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      })
+                      conditions: [],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('List alert policies successfully', () => {
@@ -54,7 +52,7 @@ describe('Alert Policies Feature', () => {
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(2);
-      
+
       result.forEach((policy: any) => {
         expect(policy).toHaveProperty('id');
         expect(policy).toHaveProperty('name');
@@ -71,14 +69,14 @@ describe('Alert Policies Feature', () => {
             account: {
               alerts: {
                 policiesSearch: {
-                  policies: []
-                }
-              }
-            }
-          }
-        }
+                  policies: [],
+                },
+              },
+            },
+          },
+        },
       });
-      
+
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
       const result = await alertTool.listAlertPolicies({ target_account_id: '123456' });
 
@@ -89,9 +87,8 @@ describe('Alert Policies Feature', () => {
   describe('Handle missing account ID', () => {
     it('should throw error when account ID is not provided', async () => {
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
-      await expect(alertTool.listAlertPolicies({}))
-        .rejects.toThrow('Account ID must be provided');
+
+      await expect(alertTool.listAlertPolicies({})).rejects.toThrow('Account ID must be provided');
     });
   });
 

@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('Entity Search Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -23,8 +23,8 @@ describe('Entity Search Feature', () => {
                     domain: 'APM',
                     tags: [
                       { key: 'environment', values: ['production'] },
-                      { key: 'team', values: ['backend'] }
-                    ]
+                      { key: 'team', values: ['backend'] },
+                    ],
                   },
                   {
                     guid: 'entity-2',
@@ -33,37 +33,37 @@ describe('Entity Search Feature', () => {
                     domain: 'INFRA',
                     tags: [
                       { key: 'environment', values: ['production'] },
-                      { key: 'type', values: ['database'] }
-                    ]
-                  }
+                      { key: 'type', values: ['database'] },
+                    ],
+                  },
                 ],
-                nextCursor: null
-              }
-            }
-          }
-        }
-      })
+                nextCursor: null,
+              },
+            },
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('Search entities successfully', () => {
     it('should return entities matching search query', async () => {
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      const result = await entityTool.searchEntities({ 
+      const result = await entityTool.searchEntities({
         query: 'production',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result).toBeDefined();
       expect(result.entities).toBeDefined();
       expect(Array.isArray(result.entities)).toBe(true);
       expect(result.entities).toHaveLength(2);
-      
+
       result.entities.forEach((entity: any) => {
         expect(entity).toHaveProperty('guid');
         expect(entity).toHaveProperty('name');
@@ -77,11 +77,11 @@ describe('Entity Search Feature', () => {
   describe('Filter entities by type', () => {
     it('should filter entities by specified types', async () => {
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      
-      await entityTool.searchEntities({ 
+
+      await entityTool.searchEntities({
         query: 'production',
         entity_types: ['APPLICATION', 'HOST'],
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(mockClient.executeNerdGraphQuery).toHaveBeenCalled();
@@ -94,15 +94,15 @@ describe('Entity Search Feature', () => {
   describe('Search with tags', () => {
     it('should include tags in search results', async () => {
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      const result = await entityTool.searchEntities({ 
+      const result = await entityTool.searchEntities({
         query: 'environment:production',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       const entity = result.entities[0];
       expect(entity.tags).toBeDefined();
       expect(Array.isArray(entity.tags)).toBe(true);
-      
+
       entity.tags.forEach((tag: any) => {
         expect(tag).toHaveProperty('key');
         expect(tag).toHaveProperty('values');
@@ -119,17 +119,17 @@ describe('Entity Search Feature', () => {
             entitySearch: {
               results: {
                 entities: [],
-                nextCursor: null
-              }
-            }
-          }
-        }
+                nextCursor: null,
+              },
+            },
+          },
+        },
       });
-      
+
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      const result = await entityTool.searchEntities({ 
+      const result = await entityTool.searchEntities({
         query: 'nonexistent',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result.entities).toEqual([]);
@@ -148,19 +148,19 @@ describe('Entity Search Feature', () => {
                   name: 'Entity',
                   type: 'APPLICATION',
                   domain: 'APM',
-                  tags: []
+                  tags: [],
                 }),
-                nextCursor: 'next-page-cursor'
-              }
-            }
-          }
-        }
+                nextCursor: 'next-page-cursor',
+              },
+            },
+          },
+        },
       });
-      
+
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      const result = await entityTool.searchEntities({ 
+      const result = await entityTool.searchEntities({
         query: 'large-result-set',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result.nextCursor).toBe('next-page-cursor');
@@ -170,9 +170,9 @@ describe('Entity Search Feature', () => {
   describe('Entity domain validation', () => {
     it('should return valid entity domains', async () => {
       const entityTool = new (await import('../../../src/tools/entity')).EntityTool(mockClient);
-      const result = await entityTool.searchEntities({ 
+      const result = await entityTool.searchEntities({
         query: 'production',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       const validDomains = ['APM', 'INFRA', 'BROWSER', 'MOBILE', 'SYNTH'];

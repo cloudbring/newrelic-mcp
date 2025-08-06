@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('NerdGraph Queries Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -15,17 +15,17 @@ describe('NerdGraph Queries Feature', () => {
           actor: {
             account: {
               id: '123456',
-              name: 'Test Account'
-            }
-          }
-        }
-      })
+              name: 'Test Account',
+            },
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('Execute NerdGraph query successfully', () => {
@@ -56,9 +56,9 @@ describe('NerdGraph Queries Feature', () => {
         data: {
           alertsNrqlConditionStaticCreate: {
             id: 'condition-123',
-            name: 'New Condition'
-          }
-        }
+            name: 'New Condition',
+          },
+        },
       });
 
       const mutation = `
@@ -90,9 +90,9 @@ describe('NerdGraph Queries Feature', () => {
         errors: [
           {
             message: 'Field "invalidField" does not exist',
-            extensions: { code: 'GRAPHQL_VALIDATION_FAILED' }
-          }
-        ]
+            extensions: { code: 'GRAPHQL_VALIDATION_FAILED' },
+          },
+        ],
       });
 
       const invalidQuery = `
@@ -116,10 +116,10 @@ describe('NerdGraph Queries Feature', () => {
           actor: {
             entity: {
               guid: 'entity-123',
-              name: 'Test Entity'
-            }
-          }
-        }
+              name: 'Test Entity',
+            },
+          },
+        },
       });
 
       const query = `
@@ -150,12 +150,12 @@ describe('NerdGraph Queries Feature', () => {
               nrql: {
                 results: [
                   { count: 100, facet: 'error' },
-                  { count: 50, facet: 'warning' }
-                ]
-              }
-            }
-          }
-        }
+                  { count: 50, facet: 'warning' },
+                ],
+              },
+            },
+          },
+        },
       });
 
       const query = `
@@ -178,14 +178,13 @@ describe('NerdGraph Queries Feature', () => {
 
   describe('Rate limiting handling', () => {
     it('should handle rate limit errors', async () => {
-      mockClient.executeNerdGraphQuery = vi.fn().mockRejectedValue(
-        new Error('Rate limit exceeded. Please retry after 60 seconds.')
-      );
+      mockClient.executeNerdGraphQuery = vi
+        .fn()
+        .mockRejectedValue(new Error('Rate limit exceeded. Please retry after 60 seconds.'));
 
       const query = '{ actor { account(id: 123456) { name } } }';
-      
-      await expect(mockClient.executeNerdGraphQuery(query))
-        .rejects.toThrow('Rate limit exceeded');
+
+      await expect(mockClient.executeNerdGraphQuery(query)).rejects.toThrow('Rate limit exceeded');
     });
   });
 
@@ -196,10 +195,10 @@ describe('NerdGraph Queries Feature', () => {
           __schema: {
             types: [
               { name: 'Account', kind: 'OBJECT' },
-              { name: 'Entity', kind: 'INTERFACE' }
-            ]
-          }
-        }
+              { name: 'Entity', kind: 'INTERFACE' },
+            ],
+          },
+        },
       });
 
       const introspectionQuery = `

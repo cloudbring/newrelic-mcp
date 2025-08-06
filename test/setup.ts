@@ -1,5 +1,5 @@
-import { beforeAll, afterAll, beforeEach } from 'vitest';
 import dotenv from 'dotenv';
+import { afterAll, beforeAll, beforeEach } from 'vitest';
 
 // Load .env.test which contains real New Relic credentials for test telemetry
 // This allows us to monitor test execution in New Relic

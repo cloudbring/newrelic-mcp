@@ -1,4 +1,4 @@
-import { Given, When, Then } from '@amiceli/vitest-cucumber';
+import { Given, Then, When } from '@amiceli/vitest-cucumber';
 import { expect, vi } from 'vitest';
 import { context, resetContext } from './shared.steps';
 
@@ -35,7 +35,8 @@ Given('I provide a NRQL query with syntax errors', () => {
 });
 
 Given('I have a complex NRQL query with aggregations and filters', () => {
-  nrqlQuery = 'SELECT average(duration) FROM Transaction WHERE appName = "MyApp" FACET host SINCE 1 hour ago';
+  nrqlQuery =
+    'SELECT average(duration) FROM Transaction WHERE appName = "MyApp" FACET host SINCE 1 hour ago';
 });
 
 Given('I have a NRQL query with TIMESERIES clause', () => {
@@ -53,30 +54,30 @@ Given('I have a NRQL query that references specific event types', () => {
 When('I call the {string} tool with the query', async (toolName: string) => {
   resetContext();
   context.toolName = toolName;
-  
+
   if (!context.server) {
     const { NewRelicMCPServer } = await import('../../src/server');
     const { NewRelicClient } = await import('../../src/client/newrelic-client');
-    
+
     context.mockClient = {
       validateCredentials: vi.fn().mockResolvedValue(true),
       runNrqlQuery: vi.fn().mockResolvedValue({
         results: [{ count: 100 }],
         metadata: {
           eventTypes: ['Transaction'],
-          timeWindow: { begin: 1234567890, end: 1234567900 }
-        }
+          timeWindow: { begin: 1234567890, end: 1234567900 },
+        },
       }),
-      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} })
+      executeNerdGraphQuery: vi.fn().mockResolvedValue({ data: {} }),
     } as any;
-    
+
     context.server = new NewRelicMCPServer(context.mockClient);
   }
-  
+
   try {
     context.lastResponse = await context.server.executeTool(toolName, {
       nrql: nrqlQuery,
-      target_account_id: queryAccountId || context.accountId || '123456'
+      target_account_id: queryAccountId || context.accountId || '123456',
     });
     context.lastError = null;
   } catch (error: any) {
@@ -96,12 +97,12 @@ When('I call the {string} tool with the complex query', async (toolName: string)
 When('I call the {string} tool', async (toolName: string) => {
   resetContext();
   context.toolName = toolName;
-  
+
   try {
     const params: any = {};
     if (nrqlQuery) params.nrql = nrqlQuery;
     if (queryAccountId) params.target_account_id = queryAccountId;
-    
+
     context.lastResponse = await context.server?.executeTool(toolName, params);
     context.lastError = null;
   } catch (error: any) {

@@ -1,10 +1,10 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient, NrqlQueryResult } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 import { z } from 'zod';
+import type { NewRelicClient, NrqlQueryResult } from '../client/newrelic-client';
 
-const NrqlInputSchema = z.object({
+const _NrqlInputSchema = z.object({
   nrql: z.string().min(1),
-  target_account_id: z.string().optional()
+  target_account_id: z.string().optional(),
 });
 
 export class NrqlTool {
@@ -20,7 +20,7 @@ export class NrqlTool {
     return {
       name: this.name,
       description: this.description,
-      inputSchema: this.getInputSchema()
+      inputSchema: this.getInputSchema(),
     };
   }
 
@@ -30,14 +30,14 @@ export class NrqlTool {
       properties: {
         nrql: {
           type: 'string',
-          description: 'The NRQL query to execute'
+          description: 'The NRQL query to execute',
         },
         target_account_id: {
           type: 'string',
-          description: 'Optional New Relic account ID to query'
-        }
+          description: 'Optional New Relic account ID to query',
+        },
       },
-      required: ['nrql']
+      required: ['nrql'],
     };
   }
 
@@ -57,7 +57,7 @@ export class NrqlTool {
 
     const result = await this.client.runNrqlQuery({
       nrql: input.nrql,
-      accountId: input.target_account_id
+      accountId: input.target_account_id,
     });
 
     return result;

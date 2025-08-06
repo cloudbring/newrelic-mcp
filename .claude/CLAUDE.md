@@ -7,12 +7,14 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 ## Code Standards
 
 ### Formatting and Linting
+
 - **Use Biome** for all code formatting and linting (configured in `biome.json`)
 - Run `npm run lint` before committing code
 - Run `npm run format` to auto-fix formatting issues
 - Ensure no linting errors before marking tasks complete
 
 ### TypeScript Guidelines
+
 - Always use TypeScript strict mode
 - Define explicit return types for all functions
 - Avoid `any` type - use `unknown` or proper types
@@ -21,6 +23,7 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 - Use const assertions where appropriate
 
 ### Code Style
+
 - Single quotes for strings in TypeScript/JavaScript
 - Double quotes for JSX attributes
 - Always use semicolons
@@ -31,12 +34,14 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 ## Testing Requirements
 
 ### Test Coverage
+
 - Maintain minimum 90% code coverage
 - Write tests BEFORE implementing features (TDD)
 - Use Vitest for all testing
 - Use BDD with Gherkin features in `test/features/`
 
 ### Test Organization
+
 - Unit tests: `test/**/*.test.ts`
 - BDD tests: `test/features/**/*.spec.ts`
 - Integration tests: Run with `USE_REAL_ENV=true`
@@ -46,6 +51,7 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 ## New Relic Specific
 
 ### API Integration
+
 - Always use the `NewRelicClient` class
 - Never hardcode API keys or account IDs
 - Validate all NRQL queries before execution
@@ -53,6 +59,7 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 - Implement proper retry logic for network failures
 
 ### Security
+
 - Use environment variables for credentials
 - Never log sensitive information
 - Validate and sanitize all inputs
@@ -62,6 +69,7 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 ## MCP Development
 
 ### Tool Implementation
+
 - Each tool should have a single, clear purpose
 - Validate inputs using Zod schemas
 - Return structured, typed responses
@@ -69,6 +77,7 @@ This is a Model Context Protocol (MCP) server for integrating with New Relic's o
 - Document all parameters and return values
 
 ### Server Guidelines
+
 - Follow MCP protocol specifications exactly
 - Implement proper JSON-RPC handling
 - Use structured logging for debugging
@@ -93,12 +102,14 @@ scripts/               # Utility scripts
 ## Development Workflow
 
 ### Before Writing Code
+
 1. Check existing code patterns in similar files
 2. Review relevant test files
 3. Understand the feature requirements
 4. Plan the implementation approach
 
 ### While Writing Code
+
 1. Follow existing code patterns
 2. Write tests first (TDD)
 3. Implement minimal code to pass tests
@@ -106,6 +117,7 @@ scripts/               # Utility scripts
 5. Update documentation if needed
 
 ### After Writing Code
+
 1. Run `npm run lint` to check for issues
 2. Run `npm run format` to fix formatting
 3. Run `npm test` to ensure tests pass
@@ -115,6 +127,7 @@ scripts/               # Utility scripts
 ## Git Practices
 
 ### Commit Guidelines
+
 - Never commit sensitive data
 - Check `.gitignore` before committing
 - Write clear, descriptive commit messages
@@ -122,6 +135,7 @@ scripts/               # Utility scripts
 - Run linting before committing
 
 ### Sensitive Directories (Never Commit)
+
 - `.env` and `.env.test` files
 - `.claude-flow/` directory
 - `.hive-mind/` directory

@@ -1,5 +1,5 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient, ApmApplication } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { ApmApplication, NewRelicClient } from '../client/newrelic-client';
 
 export class ApmTool {
   private client: NewRelicClient;
@@ -17,10 +17,10 @@ export class ApmTool {
         properties: {
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
-          }
-        }
-      }
+            description: 'Optional New Relic account ID',
+          },
+        },
+      },
     };
   }
 

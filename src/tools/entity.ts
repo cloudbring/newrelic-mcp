@@ -1,5 +1,5 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { NewRelicClient } from '../client/newrelic-client';
 
 export class EntityTool {
   private client: NewRelicClient;
@@ -17,20 +17,20 @@ export class EntityTool {
         properties: {
           query: {
             type: 'string',
-            description: 'Search query for entities'
+            description: 'Search query for entities',
           },
           entity_types: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Filter by entity types (e.g., APPLICATION, HOST)'
+            description: 'Filter by entity types (e.g., APPLICATION, HOST)',
           },
           target_account_id: {
             type: 'string',
-            description: 'Optional New Relic account ID'
-          }
+            description: 'Optional New Relic account ID',
+          },
         },
-        required: ['query']
-      }
+        required: ['query'],
+      },
     };
   }
 
@@ -43,18 +43,18 @@ export class EntityTool {
         properties: {
           entity_guid: {
             type: 'string',
-            description: 'The GUID of the entity'
-          }
+            description: 'The GUID of the entity',
+          },
         },
-        required: ['entity_guid']
-      }
+        required: ['entity_guid'],
+      },
     };
   }
 
   async searchEntities(input: any): Promise<any> {
     const accountId = input.target_account_id;
     let query = input.query;
-    
+
     if (accountId) {
       query += ` AND accountId = '${accountId}'`;
     }
@@ -140,11 +140,11 @@ export class EntityTool {
 
     const response = await this.client.executeNerdGraphQuery(graphqlQuery);
     const entity = response.data?.actor?.entity;
-    
+
     if (!entity) {
       throw new Error('Entity not found');
     }
-    
+
     return entity;
   }
 }

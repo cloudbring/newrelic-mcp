@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('Acknowledge Incidents Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -18,27 +18,27 @@ describe('Acknowledge Incidents Feature', () => {
                 issueId: 'incident-1',
                 state: 'ACKNOWLEDGED',
                 acknowledgedAt: '2024-01-01T10:00:00Z',
-                acknowledgedBy: 'user@example.com'
-              }
+                acknowledgedBy: 'user@example.com',
+              },
             ],
-            errors: []
-          }
-        }
-      })
+            errors: [],
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('Acknowledge incident successfully', () => {
     it('should acknowledge an open incident', async () => {
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      const result = await alertTool.acknowledgeIncident({ 
+      const result = await alertTool.acknowledgeIncident({
         incident_id: 'incident-1',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result).toBeDefined();
@@ -55,17 +55,17 @@ describe('Acknowledge Incidents Feature', () => {
           aiIssuesAcknowledge: {
             issues: [
               { issueId: 'incident-1', state: 'ACKNOWLEDGED' },
-              { issueId: 'incident-2', state: 'ACKNOWLEDGED' }
+              { issueId: 'incident-2', state: 'ACKNOWLEDGED' },
             ],
-            errors: []
-          }
-        }
+            errors: [],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      const result = await alertTool.acknowledgeIncidents({ 
+      const result = await alertTool.acknowledgeIncidents({
         incident_ids: ['incident-1', 'incident-2'],
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result).toHaveLength(2);
@@ -83,19 +83,21 @@ describe('Acknowledge Incidents Feature', () => {
             errors: [
               {
                 type: 'INVALID_STATE',
-                description: 'Incident is already acknowledged'
-              }
-            ]
-          }
-        }
+                description: 'Incident is already acknowledged',
+              },
+            ],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
-      await expect(alertTool.acknowledgeIncident({ 
-        incident_id: 'incident-1',
-        target_account_id: '123456'
-      })).rejects.toThrow('Incident is already acknowledged');
+
+      await expect(
+        alertTool.acknowledgeIncident({
+          incident_id: 'incident-1',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Incident is already acknowledged');
     });
   });
 
@@ -108,19 +110,21 @@ describe('Acknowledge Incidents Feature', () => {
             errors: [
               {
                 type: 'INVALID_STATE',
-                description: 'Cannot acknowledge closed incident'
-              }
-            ]
-          }
-        }
+                description: 'Cannot acknowledge closed incident',
+              },
+            ],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
-      await expect(alertTool.acknowledgeIncident({ 
-        incident_id: 'closed-incident',
-        target_account_id: '123456'
-      })).rejects.toThrow('Cannot acknowledge closed incident');
+
+      await expect(
+        alertTool.acknowledgeIncident({
+          incident_id: 'closed-incident',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Cannot acknowledge closed incident');
     });
   });
 
@@ -133,19 +137,21 @@ describe('Acknowledge Incidents Feature', () => {
             errors: [
               {
                 type: 'NOT_FOUND',
-                description: 'Incident not found'
-              }
-            ]
-          }
-        }
+                description: 'Incident not found',
+              },
+            ],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
-      await expect(alertTool.acknowledgeIncident({ 
-        incident_id: 'invalid-id',
-        target_account_id: '123456'
-      })).rejects.toThrow('Incident not found');
+
+      await expect(
+        alertTool.acknowledgeIncident({
+          incident_id: 'invalid-id',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Incident not found');
     });
   });
 
@@ -159,19 +165,19 @@ describe('Acknowledge Incidents Feature', () => {
                 issueId: 'incident-1',
                 state: 'ACKNOWLEDGED',
                 acknowledgedAt: '2024-01-01T10:00:00Z',
-                comment: 'Investigating the issue'
-              }
+                comment: 'Investigating the issue',
+              },
             ],
-            errors: []
-          }
-        }
+            errors: [],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      const result = await alertTool.acknowledgeIncident({ 
+      const result = await alertTool.acknowledgeIncident({
         incident_id: 'incident-1',
         comment: 'Investigating the issue',
-        target_account_id: '123456'
+        target_account_id: '123456',
       });
 
       expect(result.comment).toBe('Investigating the issue');
@@ -187,19 +193,21 @@ describe('Acknowledge Incidents Feature', () => {
             errors: [
               {
                 type: 'FORBIDDEN',
-                description: 'Insufficient permissions to acknowledge incidents'
-              }
-            ]
-          }
-        }
+                description: 'Insufficient permissions to acknowledge incidents',
+              },
+            ],
+          },
+        },
       });
 
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
-      await expect(alertTool.acknowledgeIncident({ 
-        incident_id: 'incident-1',
-        target_account_id: '123456'
-      })).rejects.toThrow('Insufficient permissions');
+
+      await expect(
+        alertTool.acknowledgeIncident({
+          incident_id: 'incident-1',
+          target_account_id: '123456',
+        })
+      ).rejects.toThrow('Insufficient permissions');
     });
   });
 });

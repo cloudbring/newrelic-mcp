@@ -1,5 +1,5 @@
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
-import { NewRelicClient } from '../client/newrelic-client';
+import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { NewRelicClient } from '../client/newrelic-client';
 
 export class NerdGraphTool {
   private client: NewRelicClient;
@@ -17,11 +17,11 @@ export class NerdGraphTool {
         properties: {
           query: {
             type: 'string',
-            description: 'The GraphQL query to execute'
-          }
+            description: 'The GraphQL query to execute',
+          },
         },
-        required: ['query']
-      }
+        required: ['query'],
+      },
     };
   }
 

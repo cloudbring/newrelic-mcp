@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../src/server';
-import { NewRelicClient } from '../../src/client/newrelic-client';
 
 describe('NewRelic MCP Server Edge Cases', () => {
   let server: NewRelicMCPServer;
@@ -12,12 +12,12 @@ describe('NewRelic MCP Server Edge Cases', () => {
       getAccountDetails: vi.fn().mockResolvedValue({ accountId: '123456', name: 'Test Account' }),
       runNrqlQuery: vi.fn(),
       listApmApplications: vi.fn(),
-      executeNerdGraphQuery: vi.fn()
+      executeNerdGraphQuery: vi.fn(),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
+
     server = new NewRelicMCPServer(mockClient);
   });
 
@@ -26,17 +26,21 @@ describe('NewRelic MCP Server Edge Cases', () => {
     try {
       const result = await server.executeTool(params.name, params.arguments);
       return {
-        content: [{
-          type: 'text',
-          text: JSON.stringify(result, null, 2)
-        }]
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
       };
     } catch (error: any) {
       return {
-        content: [{
-          type: 'text',
-          text: `Error executing tool: ${error.message}`
-        }]
+        content: [
+          {
+            type: 'text',
+            text: `Error executing tool: ${error.message}`,
+          },
+        ],
       };
     }
   };
@@ -45,7 +49,7 @@ describe('NewRelic MCP Server Edge Cases', () => {
     it('should handle tool not found', async () => {
       const result = await handleToolCall({
         name: 'nonexistent_tool',
-        arguments: {}
+        arguments: {},
       });
 
       expect(result.content[0].text).toContain('Error executing tool');
@@ -53,16 +57,14 @@ describe('NewRelic MCP Server Edge Cases', () => {
     });
 
     it('should handle tool execution errors gracefully', async () => {
-      mockClient.runNrqlQuery = vi.fn().mockRejectedValue(
-        new Error('Network error')
-      );
+      mockClient.runNrqlQuery = vi.fn().mockRejectedValue(new Error('Network error'));
 
       const result = await handleToolCall({
         name: 'run_nrql_query',
         arguments: {
           nrql: 'SELECT * FROM Transaction',
-          account_id: '123456'
-        }
+          account_id: '123456',
+        },
       });
 
       expect(result.content[0].text).toContain('Error executing tool');
@@ -72,7 +74,7 @@ describe('NewRelic MCP Server Edge Cases', () => {
     it('should handle malformed tool arguments', async () => {
       const result = await handleToolCall({
         name: 'run_nrql_query',
-        arguments: null as any
+        arguments: null as any,
       });
 
       expect(result.content[0].text).toContain('Error');
@@ -85,7 +87,7 @@ describe('NewRelic MCP Server Edge Cases', () => {
       delete process.env.NEW_RELIC_API_KEY;
 
       expect(() => new NewRelicMCPServer()).toThrow('NEW_RELIC_API_KEY is required');
-      
+
       // Restore the env var
       process.env.NEW_RELIC_API_KEY = originalApiKey;
     });
@@ -94,23 +96,23 @@ describe('NewRelic MCP Server Edge Cases', () => {
   describe('Complex tool scenarios', () => {
     it('should handle concurrent tool calls', async () => {
       mockClient.runNrqlQuery = vi.fn().mockImplementation(async () => {
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         return { results: [{ count: 100 }], metadata: {} };
       });
 
       const promises = [
         handleToolCall({
           name: 'run_nrql_query',
-          arguments: { nrql: 'SELECT 1', account_id: '123456' }
+          arguments: { nrql: 'SELECT 1', account_id: '123456' },
         }),
         handleToolCall({
           name: 'run_nrql_query',
-          arguments: { nrql: 'SELECT 2', account_id: '123456' }
+          arguments: { nrql: 'SELECT 2', account_id: '123456' },
         }),
         handleToolCall({
           name: 'run_nrql_query',
-          arguments: { nrql: 'SELECT 3', account_id: '123456' }
-        })
+          arguments: { nrql: 'SELECT 3', account_id: '123456' },
+        }),
       ];
 
       const results = await Promise.all(promises);
@@ -125,16 +127,16 @@ describe('NewRelic MCP Server Edge Cases', () => {
           actor: {
             entitySearch: {
               results: {
-                entities: largeResults
-              }
-            }
-          }
-        }
+                entities: largeResults,
+              },
+            },
+          },
+        },
       });
 
       const result = await handleToolCall({
         name: 'search_entities',
-        arguments: { query: 'large', target_account_id: '123456' }
+        arguments: { query: 'large', target_account_id: '123456' },
       });
 
       const parsed = JSON.parse(result.content[0].text);
@@ -150,17 +152,17 @@ describe('NewRelic MCP Server Edge Cases', () => {
             account: {
               alerts: {
                 policiesSearch: {
-                  policies: []
-                }
-              }
-            }
-          }
-        }
+                  policies: [],
+                },
+              },
+            },
+          },
+        },
       });
 
       const result = await handleToolCall({
         name: 'list_alert_policies',
-        arguments: { target_account_id: '123456' }
+        arguments: { target_account_id: '123456' },
       });
 
       const parsed = JSON.parse(result.content[0].text);
@@ -174,20 +176,20 @@ describe('NewRelic MCP Server Edge Cases', () => {
             entitySearch: {
               results: {
                 entities: [
-                  { 
+                  {
                     // Missing issues property
-                    guid: 'entity-1'
-                  }
-                ]
-              }
-            }
-          }
-        }
+                    guid: 'entity-1',
+                  },
+                ],
+              },
+            },
+          },
+        },
       });
 
       const result = await handleToolCall({
         name: 'list_open_incidents',
-        arguments: { target_account_id: '123456' }
+        arguments: { target_account_id: '123456' },
       });
 
       const parsed = JSON.parse(result.content[0].text);
@@ -204,8 +206,8 @@ describe('NewRelic MCP Server Edge Cases', () => {
           url: 'https://example.com',
           frequency: 999, // Invalid frequency
           locations: ['US_EAST_1'],
-          target_account_id: '123456'
-        }
+          target_account_id: '123456',
+        },
       });
 
       // Tool should handle this gracefully
@@ -218,16 +220,16 @@ describe('NewRelic MCP Server Edge Cases', () => {
           actor: {
             entitySearch: {
               results: {
-                entities: []
-              }
-            }
-          }
-        }
+                entities: [],
+              },
+            },
+          },
+        },
       });
 
       const result = await handleToolCall({
         name: 'list_synthetics_monitors',
-        arguments: { target_account_id: '123456' }
+        arguments: { target_account_id: '123456' },
       });
 
       const parsed = JSON.parse(result.content[0].text);
@@ -250,15 +252,15 @@ describe('NewRelic MCP Server Edge Cases', () => {
                     domain: 'APM',
                     tags: [
                       { key: 'environment', values: ['prod', 'staging'] },
-                      { key: 'team', values: ['backend', 'frontend', 'devops'] }
-                    ]
-                  }
+                      { key: 'team', values: ['backend', 'frontend', 'devops'] },
+                    ],
+                  },
                 ],
-                nextCursor: 'next-page'
-              }
-            }
-          }
-        }
+                nextCursor: 'next-page',
+              },
+            },
+          },
+        },
       });
 
       const result = await handleToolCall({
@@ -266,8 +268,8 @@ describe('NewRelic MCP Server Edge Cases', () => {
         arguments: {
           query: 'environment:prod AND team:backend',
           entity_types: ['APPLICATION', 'HOST'],
-          target_account_id: '123456'
-        }
+          target_account_id: '123456',
+        },
       });
 
       const parsed = JSON.parse(result.content[0].text);
@@ -279,16 +281,16 @@ describe('NewRelic MCP Server Edge Cases', () => {
       mockClient.executeNerdGraphQuery = vi.fn().mockResolvedValue({
         data: {
           actor: {
-            entity: null
-          }
-        }
+            entity: null,
+          },
+        },
       });
 
       const result = await handleToolCall({
         name: 'get_entity_details',
         arguments: {
-          entity_guid: 'nonexistent-guid'
-        }
+          entity_guid: 'nonexistent-guid',
+        },
       });
 
       expect(result.content[0].text).toContain('Error');
@@ -303,10 +305,10 @@ describe('NewRelic MCP Server Edge Cases', () => {
           actor: {
             accounts: [
               { id: '123', name: 'Account 1' },
-              { id: '456', name: 'Account 2' }
-            ]
-          }
-        }
+              { id: '456', name: 'Account 2' },
+            ],
+          },
+        },
       });
 
       // Note: execute_nerdgraph_query tool doesn't exist in the current implementation
@@ -320,9 +322,9 @@ describe('NewRelic MCP Server Edge Cases', () => {
         errors: [
           {
             message: 'Field does not exist',
-            extensions: { code: 'GRAPHQL_VALIDATION_FAILED' }
-          }
-        ]
+            extensions: { code: 'GRAPHQL_VALIDATION_FAILED' },
+          },
+        ],
       });
 
       const result = await mockClient.executeNerdGraphQuery('{ actor { invalidField } }');

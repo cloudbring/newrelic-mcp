@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 const NERDGRAPH_URL = 'https://api.newrelic.com/graphql';
 
 export interface NrqlQueryResult {
@@ -52,7 +50,7 @@ export class NewRelicClient {
 
       const response = await this.executeNerdGraphQuery(query);
       return !!response.data?.actor?.user;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -73,21 +71,18 @@ export class NewRelicClient {
     }`;
 
     const response = await this.executeNerdGraphQuery(query);
-    
+
     if (!response.data?.actor?.account) {
       throw new Error(`Account ${id} not found`);
     }
 
     return {
       accountId: response.data.actor.account.id,
-      name: response.data.actor.account.name
+      name: response.data.actor.account.name,
     };
   }
 
-  async runNrqlQuery(params: {
-    nrql: string;
-    accountId: string;
-  }): Promise<NrqlQueryResult> {
+  async runNrqlQuery(params: { nrql: string; accountId: string }): Promise<NrqlQueryResult> {
     if (!params.nrql || typeof params.nrql !== 'string') {
       throw new Error('Invalid or empty NRQL query provided');
     }
@@ -116,27 +111,27 @@ export class NewRelicClient {
 
     try {
       const response = await this.executeNerdGraphQuery(query);
-      
+
       if (response.errors) {
         const errorMessage = response.errors[0]?.message || 'NRQL query failed';
         throw new Error(errorMessage);
       }
 
       const nrqlResult = response.data?.actor?.account?.nrql;
-      
+
       if (!nrqlResult) {
         throw new Error('No results returned from NRQL query');
       }
 
       // Detect if it's a time series query
       const isTimeSeries = params.nrql.toLowerCase().includes('timeseries');
-      
+
       return {
         results: nrqlResult.results || [],
         metadata: {
           ...nrqlResult.metadata,
-          timeSeries: isTimeSeries
-        }
+          timeSeries: isTimeSeries,
+        },
       };
     } catch (error: any) {
       if (error.message.includes('Syntax error')) {
@@ -183,15 +178,15 @@ export class NewRelicClient {
       language: entity.language || 'unknown',
       reporting: entity.reporting || false,
       alertSeverity: entity.alertSeverity,
-      tags: this.parseTags(entity.tags)
+      tags: this.parseTags(entity.tags),
     }));
   }
 
   private parseTags(tags?: any[]): Record<string, string> {
     if (!tags) return {};
-    
+
     const result: Record<string, string> = {};
-    tags.forEach(tag => {
+    tags.forEach((tag) => {
       if (tag.key && tag.values?.length > 0) {
         result[tag.key] = tag.values[0];
       }
@@ -209,9 +204,9 @@ export class NewRelicClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'API-Key': this.apiKey
+        'API-Key': this.apiKey,
       },
-      body: JSON.stringify({ query, variables })
+      body: JSON.stringify({ query, variables }),
     });
 
     if (!response.ok) {

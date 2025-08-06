@@ -1,11 +1,15 @@
-import { NodeSDK } from '@opentelemetry/sdk-node';
+import { SpanKind, SpanStatusCode, trace } from '@opentelemetry/api';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { Resource } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { BatchSpanProcessor, ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WinstonInstrumentation } from '@opentelemetry/instrumentation-winston';
-import { trace, SpanStatusCode, SpanKind } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import {
+  BatchSpanProcessor,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/sdk-trace-base';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 
 const isTest = process.env.NODE_ENV === 'test';
 
@@ -32,7 +36,7 @@ const createTraceExporter = () => {
     // Use OTLP exporter for production/staging
     return new OTLPTraceExporter({
       url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-      headers: process.env.OTEL_EXPORTER_OTLP_HEADERS 
+      headers: process.env.OTEL_EXPORTER_OTLP_HEADERS
         ? JSON.parse(process.env.OTEL_EXPORTER_OTLP_HEADERS)
         : undefined,
     });
@@ -51,7 +55,7 @@ export const initializeOpenTelemetry = () => {
   }
 
   const exporter = createTraceExporter();
-  const spanProcessor = isTest 
+  const spanProcessor = isTest
     ? new SimpleSpanProcessor(exporter)
     : new BatchSpanProcessor(exporter);
 
@@ -114,7 +118,7 @@ export const withToolSpan = async <T>(
   attributes?: Record<string, any>
 ): Promise<T> => {
   const tracer = getTracer();
-  
+
   return tracer.startActiveSpan(
     `tool.${toolName}.${operation}`,
     {

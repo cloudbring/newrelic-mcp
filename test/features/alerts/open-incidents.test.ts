@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { NewRelicClient } from '../../../src/client/newrelic-client';
 import { NewRelicMCPServer } from '../../../src/server';
-import { NewRelicClient } from '../../../src/client/newrelic-client';
 
 describe('Open Incidents Feature', () => {
-  let server: NewRelicMCPServer;
+  let _server: NewRelicMCPServer;
   let mockClient: NewRelicClient;
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('Open Incidents Feature', () => {
                           priority: 'CRITICAL',
                           state: 'OPEN',
                           createdAt: '2024-01-01T00:00:00Z',
-                          sources: ['APM']
+                          sources: ['APM'],
                         },
                         {
                           issueId: 'incident-2',
@@ -33,23 +33,23 @@ describe('Open Incidents Feature', () => {
                           priority: 'HIGH',
                           state: 'OPEN',
                           createdAt: '2024-01-01T01:00:00Z',
-                          sources: ['Infrastructure']
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
-      })
+                          sources: ['Infrastructure'],
+                        },
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      }),
     } as any;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
-    
-    server = new NewRelicMCPServer(mockClient);
+
+    _server = new NewRelicMCPServer(mockClient);
   });
 
   describe('List open incidents successfully', () => {
@@ -60,7 +60,7 @@ describe('Open Incidents Feature', () => {
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(2);
-      
+
       result.forEach((incident: any) => {
         expect(incident).toHaveProperty('issueId');
         expect(incident).toHaveProperty('title');
@@ -76,11 +76,11 @@ describe('Open Incidents Feature', () => {
   describe('Filter incidents by priority', () => {
     it('should filter incidents by priority level', async () => {
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
-      
+
       // Mock should be called with priority filter
-      const result = await alertTool.listOpenIncidents({ 
+      const _result = await alertTool.listOpenIncidents({
         target_account_id: '123456',
-        priority: 'CRITICAL'
+        priority: 'CRITICAL',
       });
 
       expect(mockClient.executeNerdGraphQuery).toHaveBeenCalled();
@@ -96,13 +96,13 @@ describe('Open Incidents Feature', () => {
           actor: {
             entitySearch: {
               results: {
-                entities: []
-              }
-            }
-          }
-        }
+                entities: [],
+              },
+            },
+          },
+        },
       });
-      
+
       const alertTool = new (await import('../../../src/tools/alert')).AlertTool(mockClient);
       const result = await alertTool.listOpenIncidents({ target_account_id: '123456' });
 

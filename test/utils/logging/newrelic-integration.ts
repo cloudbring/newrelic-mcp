@@ -34,9 +34,10 @@ export class NewRelicTransport extends winston.transports.Stream {
     };
 
     // Set endpoint based on region
-    this.endpoint = this.config.region === 'EU'
-      ? 'https://log-api.eu.newrelic.com/log/v1'
-      : 'https://log-api.newrelic.com/log/v1';
+    this.endpoint =
+      this.config.region === 'EU'
+        ? 'https://log-api.eu.newrelic.com/log/v1'
+        : 'https://log-api.newrelic.com/log/v1';
 
     // Start flush timer
     this.startFlushTimer();
@@ -45,7 +46,7 @@ export class NewRelicTransport extends winston.transports.Stream {
   private handleLog(message: string): void {
     try {
       const logEntry = JSON.parse(message);
-      
+
       // Format log for New Relic
       const newRelicLog = {
         timestamp: Date.now(),
@@ -93,19 +94,23 @@ export class NewRelicTransport extends winston.transports.Stream {
           'Content-Type': 'application/json',
           'Api-Key': this.config.apiKey,
         },
-        body: JSON.stringify([{
-          common: {
-            attributes: {
-              'account.id': this.config.accountId,
-              'service.name': process.env.NEW_RELIC_APP_NAME || 'newrelic-mcp',
+        body: JSON.stringify([
+          {
+            common: {
+              attributes: {
+                'account.id': this.config.accountId,
+                'service.name': process.env.NEW_RELIC_APP_NAME || 'newrelic-mcp',
+              },
             },
+            logs,
           },
-          logs,
-        }]),
+        ]),
       });
 
       if (!response.ok) {
-        console.error(`Failed to send logs to New Relic: ${response.status} ${response.statusText}`);
+        console.error(
+          `Failed to send logs to New Relic: ${response.status} ${response.statusText}`
+        );
         // Put logs back in buffer for retry
         this.logBuffer.unshift(...logs);
       }
@@ -129,13 +134,13 @@ export const integrateWithNewRelicAPM = () => {
   try {
     // Check if New Relic agent is available
     const newrelic = require('newrelic');
-    
+
     if (newrelic) {
       // Create custom Winston format that adds New Relic trace context
       const newRelicAPMFormat = winston.format((info) => {
         // Get current transaction
         const transaction = newrelic.getTransaction();
-        
+
         if (transaction) {
           // Add trace context to log
           const traceContext = transaction.traceContext;
@@ -143,19 +148,16 @@ export const integrateWithNewRelicAPM = () => {
           info['span.id'] = traceContext.spanId;
           info['entity.guid'] = newrelic.getLinkingMetadata?.()?.['entity.guid'];
         }
-        
+
         return info;
       });
 
       // Add format to existing logger
-      winstonLogger.format = winston.format.combine(
-        newRelicAPMFormat(),
-        winstonLogger.format
-      );
+      winstonLogger.format = winston.format.combine(newRelicAPMFormat(), winstonLogger.format);
 
       console.log('New Relic APM integration enabled for logging');
     }
-  } catch (error) {
+  } catch (_error) {
     // New Relic agent not installed, skip integration
     console.debug('New Relic agent not found, skipping APM integration');
   }
@@ -178,7 +180,7 @@ export const createNewRelicLogger = (serviceName: string = 'newrelic-mcp') => {
       winston.format.timestamp(),
       winston.format.errors({ stack: true }),
       winston.format.metadata({
-        fillExcept: ['message', 'level', 'timestamp', 'label']
+        fillExcept: ['message', 'level', 'timestamp', 'label'],
       }),
       winston.format.json()
     ),
@@ -189,10 +191,7 @@ export const createNewRelicLogger = (serviceName: string = 'newrelic-mcp') => {
     transports: [
       // Console transport for local debugging
       new winston.transports.Console({
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple()
-        ),
+        format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
       }),
       // New Relic transport
       new NewRelicTransport({
@@ -222,7 +221,7 @@ export const correlateWithTrace = (traceId: string, spanId: string) => {
 // Helper to add New Relic attributes to logs
 export const addNewRelicAttributes = (attributes: Record<string, any>) => {
   const nr_attributes: Record<string, any> = {};
-  
+
   Object.entries(attributes).forEach(([key, value]) => {
     // Prefix custom attributes with 'custom.'
     if (!key.startsWith('entity.') && !key.startsWith('trace.')) {
@@ -231,11 +230,10 @@ export const addNewRelicAttributes = (attributes: Record<string, any>) => {
       nr_attributes[key] = value;
     }
   });
-  
+
   return nr_attributes;
 };
 
 // Export enhanced logger with New Relic integration
-export const enhancedLogger = process.env.NEW_RELIC_ENABLED === 'true'
-  ? createNewRelicLogger()
-  : winstonLogger;
+export const enhancedLogger =
+  process.env.NEW_RELIC_ENABLED === 'true' ? createNewRelicLogger() : winstonLogger;

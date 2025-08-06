@@ -5,25 +5,19 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: [
-      './test/setup.ts', 
+      './test/setup.ts',
       'dotenv/config',
-      './test/setup/vitest-hooks.ts' // Enable telemetry hooks for New Relic monitoring
+      './test/setup/vitest-hooks.ts', // Enable telemetry hooks for New Relic monitoring
     ],
     include: ['test/**/*.test.ts', 'test/**/*.spec.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'test/',
-        'dist/',
-        '*.config.ts',
-        '**/*.eval.ts'
-      ]
+      exclude: ['node_modules/', 'test/', 'dist/', '*.config.ts', '**/*.eval.ts'],
     },
     // Test timeout for OpenTelemetry operations
     testTimeout: 10000,
-    hookTimeout: 5000
-  }
+    hookTimeout: 5000,
+  },
 });
