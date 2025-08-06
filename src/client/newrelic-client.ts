@@ -1,0 +1,218 @@
+import { z } from 'zod';
+
+const NERDGRAPH_URL = 'https://api.newrelic.com/graphql';
+
+export interface NrqlQueryResult {
+  results: any[];
+  metadata: {
+    eventTypes?: string[];
+    timeWindow?: {
+      begin: number;
+      end: number;
+    };
+    facets?: string[];
+    timeSeries?: boolean;
+  };
+}
+
+export interface AccountDetails {
+  accountId: string;
+  name: string;
+  region?: string;
+}
+
+export interface ApmApplication {
+  guid: string;
+  name: string;
+  language: string;
+  reporting: boolean;
+  alertSeverity?: string;
+  tags?: Record<string, string>;
+}
+
+export class NewRelicClient {
+  private apiKey: string;
+  private defaultAccountId?: string;
+
+  constructor(apiKey: string, defaultAccountId?: string) {
+    this.apiKey = apiKey;
+    this.defaultAccountId = defaultAccountId;
+  }
+
+  async validateCredentials(): Promise<boolean> {
+    try {
+      const query = `{
+        actor {
+          user {
+            id
+            email
+          }
+        }
+      }`;
+
+      const response = await this.executeNerdGraphQuery(query);
+      return !!response.data?.actor?.user;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async getAccountDetails(accountId?: string): Promise<AccountDetails> {
+    const id = accountId || this.defaultAccountId;
+    if (!id) {
+      throw new Error('Account ID must be provided');
+    }
+
+    const query = `{
+      actor {
+        account(id: ${id}) {
+          id
+          name
+        }
+      }
+    }`;
+
+    const response = await this.executeNerdGraphQuery(query);
+    
+    if (!response.data?.actor?.account) {
+      throw new Error(`Account ${id} not found`);
+    }
+
+    return {
+      accountId: response.data.actor.account.id,
+      name: response.data.actor.account.name
+    };
+  }
+
+  async runNrqlQuery(params: {
+    nrql: string;
+    accountId: string;
+  }): Promise<NrqlQueryResult> {
+    if (!params.nrql || typeof params.nrql !== 'string') {
+      throw new Error('Invalid or empty NRQL query provided');
+    }
+
+    if (!params.accountId || !/^\d+$/.test(params.accountId)) {
+      throw new Error('Invalid account ID format');
+    }
+
+    const query = `{
+      actor {
+        account(id: ${params.accountId}) {
+          nrql(query: "${params.nrql.replace(/"/g, '\\"')}") {
+            results
+            metadata {
+              eventTypes
+              timeWindow {
+                begin
+                end
+              }
+              facets
+            }
+          }
+        }
+      }
+    }`;
+
+    try {
+      const response = await this.executeNerdGraphQuery(query);
+      
+      if (response.errors) {
+        const errorMessage = response.errors[0]?.message || 'NRQL query failed';
+        throw new Error(errorMessage);
+      }
+
+      const nrqlResult = response.data?.actor?.account?.nrql;
+      
+      if (!nrqlResult) {
+        throw new Error('No results returned from NRQL query');
+      }
+
+      // Detect if it's a time series query
+      const isTimeSeries = params.nrql.toLowerCase().includes('timeseries');
+      
+      return {
+        results: nrqlResult.results || [],
+        metadata: {
+          ...nrqlResult.metadata,
+          timeSeries: isTimeSeries
+        }
+      };
+    } catch (error: any) {
+      if (error.message.includes('Syntax error')) {
+        throw new Error(`NRQL Syntax error: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  async listApmApplications(accountId?: string): Promise<ApmApplication[]> {
+    const id = accountId || this.defaultAccountId;
+    if (!id) {
+      throw new Error('Account ID must be provided');
+    }
+
+    const query = `{
+      actor {
+        entitySearch(query: "domain = 'APM' AND type = 'APPLICATION' AND accountId = '${id}'") {
+          results {
+            entities {
+              guid
+              name
+              ... on ApmApplicationEntityOutline {
+                language
+                reporting
+                alertSeverity
+                tags {
+                  key
+                  values
+                }
+              }
+            }
+          }
+        }
+      }
+    }`;
+
+    const response = await this.executeNerdGraphQuery(query);
+    const entities = response.data?.actor?.entitySearch?.results?.entities || [];
+
+    return entities.map((entity: any) => ({
+      guid: entity.guid,
+      name: entity.name,
+      language: entity.language || 'unknown',
+      reporting: entity.reporting || false,
+      alertSeverity: entity.alertSeverity,
+      tags: this.parseTags(entity.tags)
+    }));
+  }
+
+  private parseTags(tags?: any[]): Record<string, string> {
+    if (!tags) return {};
+    
+    const result: Record<string, string> = {};
+    tags.forEach(tag => {
+      if (tag.key && tag.values?.length > 0) {
+        result[tag.key] = tag.values[0];
+      }
+    });
+    return result;
+  }
+
+  async executeNerdGraphQuery(query: string): Promise<any> {
+    const response = await fetch(NERDGRAPH_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'API-Key': this.apiKey
+      },
+      body: JSON.stringify({ query })
+    });
+
+    if (!response.ok) {
+      throw new Error(`NerdGraph API error: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+  }
+}

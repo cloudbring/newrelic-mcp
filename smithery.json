@@ -1,0 +1,69 @@
+{
+  "name": "newrelic-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for New Relic observability platform integration",
+  "author": "Your Name",
+  "license": "ISC",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "env": {
+    "NEW_RELIC_API_KEY": {
+      "description": "Your New Relic API key",
+      "required": true,
+      "secret": true
+    },
+    "NEW_RELIC_ACCOUNT_ID": {
+      "description": "Your New Relic account ID (optional, can be provided per tool call)",
+      "required": false
+    }
+  },
+  "tools": [
+    {
+      "name": "run_nrql_query",
+      "description": "Execute NRQL queries against New Relic data"
+    },
+    {
+      "name": "list_apm_applications",
+      "description": "List all APM applications in your New Relic account"
+    },
+    {
+      "name": "search_entities",
+      "description": "Search for entities in New Relic by name, type, or tags"
+    },
+    {
+      "name": "get_entity_details",
+      "description": "Get detailed information about a specific entity"
+    },
+    {
+      "name": "run_nerdgraph_query",
+      "description": "Execute a custom NerdGraph GraphQL query"
+    },
+    {
+      "name": "list_alert_policies",
+      "description": "List all alert policies in your New Relic account"
+    },
+    {
+      "name": "list_open_incidents",
+      "description": "List all open incidents in your New Relic account"
+    },
+    {
+      "name": "acknowledge_incident",
+      "description": "Acknowledge an open incident"
+    },
+    {
+      "name": "list_synthetics_monitors",
+      "description": "List all Synthetics monitors in your New Relic account"
+    },
+    {
+      "name": "create_browser_monitor",
+      "description": "Create a new browser-based Synthetics monitor"
+    },
+    {
+      "name": "get_account_details",
+      "description": "Get New Relic account details"
+    }
+  ]
+}
