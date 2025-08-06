@@ -193,10 +193,12 @@ git push origin main --tags
    - Link to GitHub
 
 ### Submit to Communities
-- MCP Discord: https://discord.gg/mcp
+- Anthropic Discord (if you have access)
 - r/LocalLLaMA subreddit
-- Anthropic Discord
-- New Relic community forums (with disclaimer)
+- r/OpenAI subreddit
+- Hacker News (Show HN post)
+- New Relic community forums (with disclaimer about being unofficial)
+- MCP GitHub Discussions: https://github.com/modelcontextprotocol/specification/discussions
 
 ### Documentation Sites
 Consider creating:

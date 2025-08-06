@@ -66,8 +66,8 @@ git push origin master --tags
 ## 📢 Announce Your MCP Server
 
 ### MCP Community
-1. Join MCP Discord: https://discord.gg/mcp
-2. Post in #showcase channel
+1. Anthropic Discord: Share in relevant channels
+2. GitHub Discussions: Start discussion at https://github.com/modelcontextprotocol/specification/discussions
 
 ### Social Media Template
 ```
