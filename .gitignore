@@ -28,3 +28,6 @@ test-*.js
 *.js
 !vitest.config.js
 run-inspector.sh
+
+# Local documentation - keep locally but not in repo
+NEXT_STEPS.md
