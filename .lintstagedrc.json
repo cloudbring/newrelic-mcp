@@ -1,0 +1,4 @@
+{
+  "*.{js,jsx,ts,tsx,json,jsonc,md,mdx}": ["biome check --write --no-errors-on-unmatched"],
+  "*.{ts,tsx}": ["bash -c 'tsc --noEmit'"]
+}
