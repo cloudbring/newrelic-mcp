@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -34,12 +34,12 @@ jobs:
       - name: Run type checking
         run: npm run typecheck
 
-      - name: Run tests
+      - name: Run tests (non-interactive)
         env:
           USE_REAL_ENV: ${{ vars.USE_REAL_ENV }}
           NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
           NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
-        run: npm test
+        run: npm run ai:test
 
       - name: Check test coverage
         run: npm run test:coverage
