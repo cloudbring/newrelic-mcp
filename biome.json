@@ -17,24 +17,6 @@
   },
   "linter": {
     "enabled": true,
-  "linter": {
-    // … your existing linter config, with the unsupported "domains" block removed
-  },
-  "overrides": [
-    {
-      "include": [
-        "**/*.test.*",
-        "**/*.spec.*",
-        "test/**",
-        "**/__tests__/**"
-      ],
-      "linter": {
-        "rules": {
-          "suspicious/noExplicitAny": "off"
-        }
-      }
-    }
-  ]
     "rules": {
       "recommended": true,
       "style": {
@@ -47,7 +29,7 @@
         "noUnusedVariables": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "off",
+        "noExplicitAny": "warn",
         "noImplicitAnyLet": "error"
       },
       "complexity": {
@@ -59,6 +41,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/*.test.{js,ts,tsx}", "**/*.spec.{js,ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
