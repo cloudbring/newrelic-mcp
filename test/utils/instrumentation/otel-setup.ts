@@ -115,7 +115,7 @@ export const withToolSpan = async <T>(
   toolName: string,
   operation: string,
   fn: () => Promise<T>,
-  attributes?: Record<string, any>
+  attributes?: Record<string, unknown>
 ): Promise<T> => {
   const tracer = getTracer();
 
@@ -149,7 +149,7 @@ export const withToolSpan = async <T>(
 };
 
 // Helper to add custom attributes to the current span
-export const addSpanAttributes = (attributes: Record<string, any>) => {
+export const addSpanAttributes = (attributes: Record<string, unknown>) => {
   const span = trace.getActiveSpan();
   if (span) {
     Object.entries(attributes).forEach(([key, value]) => {
@@ -161,7 +161,7 @@ export const addSpanAttributes = (attributes: Record<string, any>) => {
 };
 
 // Helper to create a span event
-export const addSpanEvent = (name: string, attributes?: Record<string, any>) => {
+export const addSpanEvent = (name: string, attributes?: Record<string, unknown>) => {
   const span = trace.getActiveSpan();
   if (span) {
     span.addEvent(name, attributes);

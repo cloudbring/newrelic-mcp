@@ -104,14 +104,15 @@ evalite('NRQL Query Tool Response Validation', {
     },
   ],
   task: async (input) => {
-    const mockClient = createMockClient() as any;
+    const mockClient = createMockClient();
     const server = new NewRelicMCPServer(mockClient);
 
     try {
       const result = await server.executeTool(input.tool, input.params);
       return JSON.stringify(result);
-    } catch (error: any) {
-      return JSON.stringify({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      return JSON.stringify({ error: message });
     }
   },
   scorers: [

@@ -36,7 +36,7 @@ describe('Alert Policies Feature', () => {
           },
         },
       }),
-    } as any;
+    } as unknown as NewRelicClient;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';
@@ -53,7 +53,7 @@ describe('Alert Policies Feature', () => {
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(2);
 
-      result.forEach((policy: any) => {
+      result.forEach((policy: Record<string, unknown>) => {
         expect(policy).toHaveProperty('id');
         expect(policy).toHaveProperty('name');
         expect(policy).toHaveProperty('incidentPreference');

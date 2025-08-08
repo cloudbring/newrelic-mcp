@@ -9,7 +9,7 @@ describe('NRQL Query Tool', () => {
   beforeEach(() => {
     mockClient = {
       runNrqlQuery: vi.fn(),
-    } as any;
+    } as unknown as NewRelicClient;
 
     tool = new NrqlTool(mockClient);
   });
@@ -65,7 +65,7 @@ describe('NRQL Query Tool', () => {
     it('should reject null NRQL query', async () => {
       await expect(
         tool.execute({
-          nrql: null as any,
+          nrql: null as unknown as string,
           target_account_id: '123456',
         })
       ).rejects.toThrow('Invalid or empty NRQL query provided');
