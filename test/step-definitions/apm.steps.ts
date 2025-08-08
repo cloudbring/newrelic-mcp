@@ -70,7 +70,6 @@ When('I call the {string} tool with a target account ID', async (toolName: strin
 
   if (!context.server) {
     const { NewRelicMCPServer } = await import('../../src/server');
-    const { NewRelicClient } = await import('../../src/client/newrelic-client');
 
     context.mockClient = {
       validateCredentials: vi.fn().mockResolvedValue(true),

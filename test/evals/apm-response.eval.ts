@@ -62,7 +62,7 @@ evalite('APM Applications Tool Response Validation', {
     },
   ],
   task: async (input) => {
-    const mockClient = createMockClient() as any;
+    const mockClient = createMockClient();
 
     // Adjust mock for different account IDs
     if (input.params.target_account_id === '999999') {
@@ -74,8 +74,9 @@ evalite('APM Applications Tool Response Validation', {
     try {
       const result = await server.executeTool(input.tool, input.params);
       return JSON.stringify(result);
-    } catch (error: any) {
-      return JSON.stringify({ error: error.message });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      return JSON.stringify({ error: message });
     }
   },
   scorers: [
@@ -93,7 +94,7 @@ evalite('APM Applications Tool Response Validation', {
           let score = 0;
           const requiredFields = ['guid', 'name', 'language', 'reporting'];
 
-          parsed.forEach((app: any) => {
+          parsed.forEach((app: Record<string, unknown>) => {
             const fieldScore = requiredFields.every((field) => field in app) ? 0.25 : 0;
             score += fieldScore;
 
@@ -132,7 +133,7 @@ evalite('APM Applications Tool Response Validation', {
           ];
           let validCount = 0;
 
-          parsed.forEach((app: any) => {
+          parsed.forEach((app: Record<string, unknown>) => {
             if (validLanguages.includes(app.language?.toLowerCase())) {
               validCount++;
             }

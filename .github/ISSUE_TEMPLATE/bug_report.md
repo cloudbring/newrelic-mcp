@@ -7,7 +7,9 @@ labels: bug
 ### Describe the bug
 
 ### To Reproduce
+
 Steps to reproduce the behavior:
+
 1. ...
 
 ### Expected behavior
@@ -15,9 +17,9 @@ Steps to reproduce the behavior:
 ### Logs/error messages
 
 ### Environment
+
 - OS:
 - Node version:
 - MCP client:
 
 ### Additional context
-

@@ -13,7 +13,7 @@ interface NewRelicLogConfig {
 // Custom Winston transport for New Relic Logs API
 export class NewRelicTransport extends winston.transports.Stream {
   private config: NewRelicLogConfig;
-  private logBuffer: any[] = [];
+  private logBuffer: Array<Record<string, unknown>> = [];
   private flushTimer?: NodeJS.Timeout;
   private endpoint: string;
 
@@ -23,7 +23,7 @@ export class NewRelicTransport extends winston.transports.Stream {
         write: (message: string) => {
           this.handleLog(message);
         },
-      } as any,
+      } as unknown as NodeJS.WritableStream,
     });
 
     this.config = {
@@ -219,8 +219,8 @@ export const correlateWithTrace = (traceId: string, spanId: string) => {
 };
 
 // Helper to add New Relic attributes to logs
-export const addNewRelicAttributes = (attributes: Record<string, any>) => {
-  const nr_attributes: Record<string, any> = {};
+export const addNewRelicAttributes = (attributes: Record<string, unknown>) => {
+  const nr_attributes: Record<string, unknown> = {};
 
   Object.entries(attributes).forEach(([key, value]) => {
     // Prefix custom attributes with 'custom.'

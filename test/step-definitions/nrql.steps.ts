@@ -57,7 +57,6 @@ When('I call the {string} tool with the query', async (toolName: string) => {
 
   if (!context.server) {
     const { NewRelicMCPServer } = await import('../../src/server');
-    const { NewRelicClient } = await import('../../src/client/newrelic-client');
 
     context.mockClient = {
       validateCredentials: vi.fn().mockResolvedValue(true),

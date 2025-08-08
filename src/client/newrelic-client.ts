@@ -1,7 +1,10 @@
 const NERDGRAPH_URL = 'https://api.newrelic.com/graphql';
 
+type GraphQLError = { message: string; [key: string]: unknown };
+type GraphQLResponse<T> = { data?: T; errors?: GraphQLError[] };
+
 export interface NrqlQueryResult {
-  results: any[];
+  results: Array<Record<string, unknown>>;
   metadata: {
     eventTypes?: string[];
     timeWindow?: {
@@ -39,6 +42,7 @@ export class NewRelicClient {
 
   async validateCredentials(): Promise<boolean> {
     try {
+      type UserResponse = { actor?: { user?: { id?: string; email?: string } } };
       const query = `{
         actor {
           user {
@@ -48,7 +52,9 @@ export class NewRelicClient {
         }
       }`;
 
-      const response = await this.executeNerdGraphQuery(query);
+      const response = (await this.executeNerdGraphQuery<UserResponse>(
+        query
+      )) as GraphQLResponse<UserResponse>;
       return !!response.data?.actor?.user;
     } catch (_error) {
       return false;
@@ -61,6 +67,7 @@ export class NewRelicClient {
       throw new Error('Account ID must be provided');
     }
 
+    type AccountResponse = { actor?: { account?: { id: string; name: string } } };
     const query = `{
       actor {
         account(id: ${id}) {
@@ -70,7 +77,9 @@ export class NewRelicClient {
       }
     }`;
 
-    const response = await this.executeNerdGraphQuery(query);
+    const response = (await this.executeNerdGraphQuery<AccountResponse>(
+      query
+    )) as GraphQLResponse<AccountResponse>;
 
     if (!response.data?.actor?.account) {
       throw new Error(`Account ${id} not found`);
@@ -110,7 +119,23 @@ export class NewRelicClient {
     }`;
 
     try {
-      const response = await this.executeNerdGraphQuery(query);
+      type NrqlResponse = {
+        actor?: {
+          account?: {
+            nrql?: {
+              results?: Array<Record<string, unknown>>;
+              metadata?: {
+                eventTypes?: string[];
+                timeWindow?: { begin: number; end: number };
+                facets?: string[];
+              };
+            };
+          };
+        };
+      };
+      const response = (await this.executeNerdGraphQuery<NrqlResponse>(
+        query
+      )) as GraphQLResponse<NrqlResponse>;
 
       if (response.errors) {
         const errorMessage = response.errors[0]?.message || 'NRQL query failed';
@@ -133,11 +158,11 @@ export class NewRelicClient {
           timeSeries: isTimeSeries,
         },
       };
-    } catch (error: any) {
-      if (error.message.includes('Syntax error')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('Syntax error')) {
         throw new Error(`NRQL Syntax error: ${error.message}`);
       }
-      throw error;
+      throw error instanceof Error ? error : new Error(String(error));
     }
   }
 
@@ -169,10 +194,35 @@ export class NewRelicClient {
       }
     }`;
 
-    const response = await this.executeNerdGraphQuery(query);
-    const entities = response.data?.actor?.entitySearch?.results?.entities || [];
+    type EntitySearchResponse = {
+      actor?: {
+        entitySearch?: {
+          results?: {
+            entities?: Array<{
+              guid: string;
+              name: string;
+              language?: string;
+              reporting?: boolean;
+              alertSeverity?: string;
+              tags?: Array<{ key?: string; values?: string[] }>;
+            }>;
+          };
+        };
+      };
+    };
+    const response = (await this.executeNerdGraphQuery<EntitySearchResponse>(
+      query
+    )) as GraphQLResponse<EntitySearchResponse>;
+    const entities = (response.data?.actor?.entitySearch?.results?.entities || []) as Array<{
+      guid: string;
+      name: string;
+      language?: string;
+      reporting?: boolean;
+      alertSeverity?: string;
+      tags?: Array<{ key?: string; values?: string[] }>;
+    }>;
 
-    return entities.map((entity: any) => ({
+    return entities.map((entity) => ({
       guid: entity.guid,
       name: entity.name,
       language: entity.language || 'unknown',
@@ -182,19 +232,23 @@ export class NewRelicClient {
     }));
   }
 
-  private parseTags(tags?: any[]): Record<string, string> {
+  private parseTags(tags?: Array<{ key?: string; values?: string[] }>): Record<string, string> {
     if (!tags) return {};
 
     const result: Record<string, string> = {};
     tags.forEach((tag) => {
-      if (tag.key && tag.values?.length > 0) {
-        result[tag.key] = tag.values[0];
+      const values = Array.isArray(tag.values) ? tag.values : [];
+      if (tag.key && values.length > 0) {
+        result[tag.key] = values[0] as string;
       }
     });
     return result;
   }
 
-  async executeNerdGraphQuery(query: string, variables?: any): Promise<any> {
+  async executeNerdGraphQuery<T = unknown>(
+    query: string,
+    variables?: Record<string, unknown>
+  ): Promise<GraphQLResponse<T>> {
     // Check if API key is missing or empty
     if (!this.apiKey || this.apiKey === '' || this.apiKey.length === 0) {
       throw new Error('NEW_RELIC_API_KEY environment variable is not set');
@@ -216,6 +270,6 @@ export class NewRelicClient {
       throw new Error(`NerdGraph API error: ${response.status} ${response.statusText}`);
     }
 
-    return await response.json();
+    return (await response.json()) as GraphQLResponse<T>;
   }
 }

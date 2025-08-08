@@ -41,6 +41,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["**/*.test.{js,ts,tsx}", "**/*.spec.{js,ts,tsx}"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "single",

@@ -41,7 +41,7 @@ export class NrqlTool {
     };
   }
 
-  async execute(input: any): Promise<NrqlQueryResult> {
+  async execute(input: { nrql?: string; target_account_id?: string }): Promise<NrqlQueryResult> {
     // Validate input
     if (!input.nrql || typeof input.nrql !== 'string' || input.nrql.trim() === '') {
       throw new Error('Invalid or empty NRQL query provided');

@@ -64,7 +64,10 @@ export class SyntheticsTool {
     };
   }
 
-  async listSyntheticsMonitors(input: any): Promise<any> {
+  async listSyntheticsMonitors(input: {
+    target_account_id?: string;
+    monitor_type?: 'SIMPLE' | 'BROWSER' | 'SCRIPT_API' | 'SCRIPT_BROWSER';
+  }): Promise<Array<Record<string, unknown>>> {
     const accountId = input.target_account_id;
     if (!accountId) {
       throw new Error('Account ID must be provided');
@@ -97,11 +100,25 @@ export class SyntheticsTool {
       }
     }`;
 
-    const response = await this.client.executeNerdGraphQuery(graphqlQuery);
+    const response = (await this.client.executeNerdGraphQuery(graphqlQuery)) as {
+      data?: {
+        actor?: {
+          entitySearch?: {
+            results?: { entities?: Array<Record<string, unknown>> };
+          };
+        };
+      };
+    };
     return response.data?.actor?.entitySearch?.results?.entities || [];
   }
 
-  async createBrowserMonitor(input: any): Promise<any> {
+  async createBrowserMonitor(input: {
+    target_account_id?: string;
+    name: string;
+    url: string;
+    frequency: number;
+    locations: string[];
+  }): Promise<Record<string, unknown> | null> {
     const accountId = input.target_account_id;
     if (!accountId) {
       throw new Error('Account ID must be provided');
@@ -136,14 +153,21 @@ export class SyntheticsTool {
       }
     `;
 
-    const response = await this.client.executeNerdGraphQuery(mutation);
+    const response = await this.client.executeNerdGraphQuery<{
+      syntheticsCreateSimpleBrowserMonitor?: {
+        monitor?: Record<string, unknown>;
+        errors?: Array<{ description?: string }>;
+      };
+    }>(mutation);
     const result = response.data?.syntheticsCreateSimpleBrowserMonitor;
 
-    if (result?.errors && result.errors.length > 0) {
-      throw new Error(`Failed to create monitor: ${result.errors[0].description}`);
+    if (Array.isArray(result?.errors) && result!.errors!.length > 0) {
+      throw new Error(
+        `Failed to create monitor: ${result!.errors![0]?.description || 'Unknown error'}`
+      );
     }
 
-    return result?.monitor || null;
+    return (result?.monitor as Record<string, unknown>) || null;
   }
 
   private frequencyToPeriod(frequency: number): string {

@@ -24,7 +24,7 @@ export class ApmTool {
     };
   }
 
-  async execute(input: any): Promise<ApmApplication[]> {
+  async execute(input: { target_account_id?: string }): Promise<ApmApplication[]> {
     if (!input.target_account_id) {
       throw new Error('Account ID must be provided');
     }

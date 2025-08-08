@@ -112,7 +112,7 @@ class CaptureSpanProcessor {
 
 // Extended test with logging fixtures
 export const test = base.extend<LoggingFixtures>({
-  logger: async ({}, use) => {
+  logger: async (_ctx, use) => {
     const captureTransport = new CaptureTransport();
     const logger = winston.createLogger({
       level: 'debug',
@@ -150,7 +150,7 @@ export const test = base.extend<LoggingFixtures>({
     transport.clear();
   },
 
-  spanCapture: async ({}, use) => {
+  spanCapture: async (_ctx, use) => {
     const processor = new CaptureSpanProcessor();
 
     const capture: SpanCapture = {
@@ -172,7 +172,7 @@ export const test = base.extend<LoggingFixtures>({
     processor.clear();
   },
 
-  withSpan: async ({}, use) => {
+  withSpan: async (_ctx, use) => {
     const tracer = getTestTracer();
 
     const withSpan = async <T>(name: string, fn: () => Promise<T>): Promise<T> => {

@@ -25,7 +25,7 @@ describe('Acknowledge Incidents Feature', () => {
           },
         },
       }),
-    } as any;
+    } as unknown as NewRelicClient;
 
     process.env.NEW_RELIC_API_KEY = 'test-api-key';
     process.env.NEW_RELIC_ACCOUNT_ID = '123456';

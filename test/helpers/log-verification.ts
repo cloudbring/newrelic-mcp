@@ -159,7 +159,9 @@ export const createMockLogger = (): winston.Logger & {
   }) as winston.Logger & { getLogs: () => LogEntry[]; clearLogs: () => void };
 
   logger.getLogs = () => logs;
-  logger.clearLogs = () => (logs.length = 0);
+  logger.clearLogs = () => {
+    logs.length = 0;
+  };
 
   return logger;
 };
