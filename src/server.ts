@@ -166,14 +166,19 @@ export class NewRelicMCPServer {
           target_account_id: accountId,
         });
       case 'acknowledge_incident':
-        return await new AlertTool(this.client).acknowledgeIncident(args);
+        return await new AlertTool(this.client).acknowledgeIncident(
+          args as {
+            incident_id: string;
+            comment?: string;
+          }
+        );
       case 'search_entities':
         return await new EntityTool(this.client).searchEntities({
-          ...args,
+          ...(args as { query: string; entity_types?: string[] }),
           target_account_id: accountId,
         });
       case 'get_entity_details':
-        return await new EntityTool(this.client).getEntityDetails(args);
+        return await new EntityTool(this.client).getEntityDetails(args as { entity_guid: string });
       case 'list_synthetics_monitors':
         return await new SyntheticsTool(this.client).listSyntheticsMonitors({
           ...args,
@@ -181,7 +186,7 @@ export class NewRelicMCPServer {
         });
       case 'create_browser_monitor':
         return await new SyntheticsTool(this.client).createBrowserMonitor({
-          ...args,
+          ...(args as { name: string; url: string; frequency: number; locations: string[] }),
           target_account_id: accountId,
         });
       case 'run_nerdgraph_query':

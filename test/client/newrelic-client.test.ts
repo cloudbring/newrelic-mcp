@@ -28,7 +28,7 @@ describe('NewRelicClient', () => {
 
   describe('validateCredentials', () => {
     it('should return true for valid credentials', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -47,7 +47,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should return false for invalid credentials', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: false,
         status: 401,
       });
@@ -59,7 +59,7 @@ describe('NewRelicClient', () => {
 
   describe('getAccountDetails', () => {
     it('should return account details', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -79,7 +79,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should throw error when account not found', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -92,7 +92,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should use default account ID when not provided', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -113,7 +113,7 @@ describe('NewRelicClient', () => {
 
   describe('runNrqlQuery', () => {
     it('should execute NRQL query successfully', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -161,7 +161,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should handle NRQL syntax errors', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           errors: [
@@ -183,7 +183,7 @@ describe('NewRelicClient', () => {
 
   describe('listApmApplications', () => {
     it('should list APM applications', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -215,7 +215,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should handle empty results', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: {
@@ -237,7 +237,7 @@ describe('NewRelicClient', () => {
 
   describe('executeNerdGraphQuery', () => {
     it('should execute query with variables', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           data: { result: 'success' },
@@ -274,7 +274,7 @@ describe('NewRelicClient', () => {
     });
 
     it('should handle 401 unauthorized', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      (global.fetch as unknown as vi.Mock).mockResolvedValueOnce({
         ok: false,
         status: 401,
         statusText: 'Unauthorized',

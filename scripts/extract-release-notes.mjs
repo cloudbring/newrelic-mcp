@@ -40,4 +40,3 @@ for (let i = start + 1; i < lines.length; i++) {
 
 const section = lines.slice(start, end).join('\n');
 console.log(section.trim());
-

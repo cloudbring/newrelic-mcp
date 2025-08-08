@@ -51,7 +51,11 @@ export class EntityTool {
     };
   }
 
-  async searchEntities(input: any): Promise<any> {
+  async searchEntities(input: {
+    query: string;
+    entity_types?: string[];
+    target_account_id?: string;
+  }): Promise<{ entities: Array<Record<string, unknown>>; nextCursor?: string }> {
     const accountId = input.target_account_id;
     let query = input.query;
 
@@ -84,11 +88,19 @@ export class EntityTool {
       }
     }`;
 
-    const response = await this.client.executeNerdGraphQuery(graphqlQuery);
+    const response = (await this.client.executeNerdGraphQuery(graphqlQuery)) as {
+      data?: {
+        actor?: {
+          entitySearch?: {
+            results?: { entities: Array<Record<string, unknown>>; nextCursor?: string };
+          };
+        };
+      };
+    };
     return response.data?.actor?.entitySearch?.results || { entities: [] };
   }
 
-  async getEntityDetails(input: any): Promise<any> {
+  async getEntityDetails(input: { entity_guid: string }): Promise<Record<string, unknown>> {
     const graphqlQuery = `{
       actor {
         entity(guid: "${input.entity_guid}") {
@@ -138,7 +150,9 @@ export class EntityTool {
       }
     }`;
 
-    const response = await this.client.executeNerdGraphQuery(graphqlQuery);
+    const response = (await this.client.executeNerdGraphQuery(graphqlQuery)) as {
+      data?: { actor?: { entity?: Record<string, unknown> } };
+    };
     const entity = response.data?.actor?.entity;
 
     if (!entity) {

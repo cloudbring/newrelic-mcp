@@ -62,7 +62,9 @@ export class AlertTool {
     };
   }
 
-  async listAlertPolicies(input: any): Promise<any> {
+  async listAlertPolicies(input: {
+    target_account_id?: string;
+  }): Promise<Array<Record<string, unknown>>> {
     const accountId = input.target_account_id;
     if (!accountId) {
       throw new Error('Account ID must be provided');
@@ -89,11 +91,18 @@ export class AlertTool {
       }
     }`;
 
-    const response = await this.client.executeNerdGraphQuery(query);
+    const response = await this.client.executeNerdGraphQuery<{
+      actor?: {
+        account?: { alerts?: { policiesSearch?: { policies?: Array<Record<string, unknown>> } } };
+      };
+    }>(query);
     return response.data?.actor?.account?.alerts?.policiesSearch?.policies || [];
   }
 
-  async listOpenIncidents(input: any): Promise<any> {
+  async listOpenIncidents(input: {
+    target_account_id?: string;
+    priority?: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  }): Promise<Record<string, unknown>[]> {
     const accountId = input.target_account_id;
     if (!accountId) {
       throw new Error('Account ID must be provided');
@@ -127,11 +136,19 @@ export class AlertTool {
       }
     }`;
 
-    const response = await this.client.executeNerdGraphQuery(query);
-    const entities = response.data?.actor?.entitySearch?.results?.entities || [];
+    const response = await this.client.executeNerdGraphQuery<{
+      actor?: {
+        entitySearch?: {
+          results?: { entities?: Array<{ issues?: { issues?: Record<string, unknown>[] } }> };
+        };
+      };
+    }>(query);
+    const entities = (response.data?.actor?.entitySearch?.results?.entities || []) as Array<{
+      issues?: { issues?: Record<string, unknown>[] };
+    }>;
 
-    const incidents: any[] = [];
-    entities.forEach((entity: any) => {
+    const incidents: Record<string, unknown>[] = [];
+    entities.forEach((entity) => {
       if (entity.issues?.issues) {
         incidents.push(...entity.issues.issues);
       }
@@ -140,7 +157,10 @@ export class AlertTool {
     return incidents;
   }
 
-  async acknowledgeIncident(input: any): Promise<any> {
+  async acknowledgeIncident(input: {
+    incident_id: string;
+    comment?: string;
+  }): Promise<Record<string, unknown> | null> {
     const mutation = `
       mutation {
         aiIssuesAcknowledge(
@@ -162,7 +182,12 @@ export class AlertTool {
       }
     `;
 
-    const response = await this.client.executeNerdGraphQuery(mutation);
+    const response = await this.client.executeNerdGraphQuery<{
+      aiIssuesAcknowledge?: {
+        issues?: Record<string, unknown>[];
+        errors?: Array<{ description?: string }>;
+      };
+    }>(mutation);
     const result = response.data?.aiIssuesAcknowledge;
 
     if (result?.errors && result.errors.length > 0) {
@@ -172,7 +197,9 @@ export class AlertTool {
     return result?.issues?.[0] || null;
   }
 
-  async acknowledgeIncidents(input: any): Promise<any> {
+  async acknowledgeIncidents(input: {
+    incident_ids: string[];
+  }): Promise<Record<string, unknown>[]> {
     const mutation = `
       mutation {
         aiIssuesAcknowledge(
@@ -190,7 +217,12 @@ export class AlertTool {
       }
     `;
 
-    const response = await this.client.executeNerdGraphQuery(mutation);
+    const response = await this.client.executeNerdGraphQuery<{
+      aiIssuesAcknowledge?: {
+        issues?: Record<string, unknown>[];
+        errors?: Array<{ description?: string }>;
+      };
+    }>(mutation);
     const result = response.data?.aiIssuesAcknowledge;
 
     if (result?.errors && result.errors.length > 0) {
