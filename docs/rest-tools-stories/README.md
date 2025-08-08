@@ -14,4 +14,4 @@ This directory contains individual story documents for each proposed REST tool. 
 - 09: List open incidents
 - 10: Acknowledge incident (blocked)
 
-- Update `docs/docs/REST_ENDPOINT_TOOL.md` if scope changes.
+- Update `docs/REST_ENDPOINT_TOOL.md` if scope changes.
