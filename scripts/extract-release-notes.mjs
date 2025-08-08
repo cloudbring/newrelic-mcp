@@ -12,7 +12,14 @@ if (!version) {
 }
 
 const changelogPath = resolve(process.cwd(), 'CHANGELOG.md');
-const content = readFileSync(changelogPath, 'utf8');
+let content;
+try {
+  content = readFileSync(changelogPath, 'utf8');
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Failed to read CHANGELOG.md: ${message}`);
+  process.exit(1);
+}
 
 const lines = content.split(/\r?\n/);
 const header = `## [${version}]`;
