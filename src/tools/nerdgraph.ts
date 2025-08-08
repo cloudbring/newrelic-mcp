@@ -1,4 +1,5 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
 import type { NewRelicClient } from '../client/newrelic-client';
 
 export class NerdGraphTool {
@@ -19,17 +20,25 @@ export class NerdGraphTool {
             type: 'string',
             description: 'The GraphQL query to execute',
           },
+          variables: {
+            type: 'object',
+            description: 'Optional GraphQL variables to supply to the query',
+          },
         },
         required: ['query'],
       },
     };
   }
 
-  async execute(input: any): Promise<any> {
-    if (!input.query || typeof input.query !== 'string') {
-      throw new Error('Invalid or empty GraphQL query provided');
-    }
+  async execute(input: unknown): Promise<unknown> {
+    // Validate input with Zod for consistency
+    const schema = z.object({
+      query: z.string().min(1, 'Invalid or empty GraphQL query provided'),
+      variables: z.record(z.any()).optional(),
+    });
 
-    return await this.client.executeNerdGraphQuery(input.query);
+    const { query, variables } = schema.parse(input);
+
+    return await this.client.executeNerdGraphQuery(query, variables);
   }
 }

@@ -112,8 +112,9 @@ export class NewRelicMCPServer {
             },
           ],
         };
-      } catch (error: any) {
-        throw new McpError(ErrorCode.InternalError, error.message || 'Tool execution failed');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Tool execution failed';
+        throw new McpError(ErrorCode.InternalError, message);
       }
     });
   }
@@ -130,8 +131,12 @@ export class NewRelicMCPServer {
     console.error('New Relic MCP Server started');
   }
 
-  async executeTool(name: string, args: any): Promise<any> {
-    const accountId = args.target_account_id || args.account_id || this.defaultAccountId;
+  async executeTool(
+    name: string,
+    args: { target_account_id?: string; account_id?: string; [key: string]: unknown }
+  ): Promise<unknown> {
+    const accountId: string | undefined =
+      args.target_account_id || args.account_id || this.defaultAccountId;
 
     if (!accountId && this.requiresAccountId(name)) {
       throw new Error('Account ID must be provided');
@@ -179,7 +184,7 @@ export class NewRelicMCPServer {
           ...args,
           target_account_id: accountId,
         });
-      case 'execute_nerdgraph_query':
+      case 'run_nerdgraph_query':
         return await new NerdGraphTool(this.client).execute(args);
       default: {
         const tool = this.tools.get(name);

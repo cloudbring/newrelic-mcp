@@ -50,6 +50,7 @@ Add to your Claude Desktop configuration file:
   }
 }
 ```
+
 </details>
 
 <details>
@@ -72,6 +73,7 @@ Add to your Cline settings in VS Code:
   ]
 }
 ```
+
 </details>
 
 <details>
@@ -97,6 +99,7 @@ Add to your Zed configuration file at `~/.config/zed/settings.json`:
   }
 }
 ```
+
 </details>
 
 <details>
@@ -118,24 +121,28 @@ Add to your Windsurf Cascade configuration:
   }
 }
 ```
+
 </details>
 
 <details>
 <summary>Local Development</summary>
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/cloudbring/newrelic-mcp.git
 cd newrelic-mcp
 ```
 
 2. Install dependencies and build:
+
 ```bash
 npm install
 npm run build
 ```
 
 3. Add to your MCP client configuration:
+
 ```json
 {
   "mcpServers": {
@@ -150,6 +157,7 @@ npm run build
   }
 }
 ```
+
 </details>
 
 ## Configuration
@@ -161,7 +169,7 @@ npm run build
 
 ### Getting Your New Relic Credentials
 
-1. **API Key**: 
+1. **API Key**:
    - Log in to [New Relic](https://one.newrelic.com)
    - Navigate to **API Keys** in the left sidebar
    - Create a new User API Key with appropriate permissions
@@ -177,28 +185,32 @@ For detailed setup instructions, see [docs/new-relic-setup.md](docs/new-relic-se
 Once configured, you can interact with New Relic through your MCP client:
 
 ### Query Your Data
-```
+
+```text
 "Show me the average response time for my web application over the last hour"
 "What are the top 10 slowest database queries today?"
 "Display error rate trends for the production environment"
 ```
 
 ### Monitor Applications
-```
+
+```text
 "List all my APM applications and their current status"
 "Show me the health of my Node.js services"
 "Which applications have active alerts?"
 ```
 
 ### Manage Alerts
-```
+
+```text
 "Show me all open incidents"
 "What critical alerts fired in the last 24 hours?"
 "Acknowledge incident #12345"
 ```
 
 ### Search Infrastructure
-```
+
+```text
 "Find all Redis databases in production"
 "Show me entities with high CPU usage"
 "List all synthetic monitors and their success rates"
@@ -228,6 +240,7 @@ Once configured, you can interact with New Relic through your MCP client:
 If you're having trouble connecting:
 
 1. Verify your API key is valid:
+
    ```bash
    curl -X POST https://api.newrelic.com/graphql \
      -H 'Content-Type: application/json' \
@@ -238,6 +251,7 @@ If you're having trouble connecting:
 2. Check that your Account ID is correct
 3. Ensure your API key has the necessary permissions
 4. Check the MCP client logs for detailed error messages
+
 </details>
 
 <details>
@@ -251,13 +265,14 @@ If you receive permission errors:
    - For alerts: `Alerts` read/write permissions
 
 2. Create a new API key with broader permissions if needed
+
 </details>
 
 ## Development
 
 ### Project Structure
 
-```
+```text
 src/
 ├── server.ts           # Main MCP server implementation
 ├── client/
@@ -274,23 +289,27 @@ src/
 ### Setup Development Environment
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/cloudbring/newrelic-mcp.git
 cd newrelic-mcp
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create a `.env` file:
+
 ```bash
 NEW_RELIC_API_KEY=your-api-key-here
 NEW_RELIC_ACCOUNT_ID=your-account-id
 ```
 
 4. Build the project:
+
 ```bash
 npm run build
 ```
@@ -323,6 +342,7 @@ npm run test:server
 ### Testing
 
 The project uses Test-Driven Development (TDD) with:
+
 - **Vitest** for unit testing
 - **Gherkin** for BDD testing
 - **Evalite** for LLM response validation
@@ -361,11 +381,13 @@ See [docs/mcp-inspector-setup.md](docs/mcp-inspector-setup.md) for detailed inst
 ### Architecture
 
 The server follows a modular architecture with:
+
 - **Client Layer**: Handles New Relic API communication
 - **Tools Layer**: Implements MCP tool specifications
 - **Server Layer**: Manages MCP protocol and tool routing
 
 Each tool:
+
 - Has a single, focused purpose
 - Validates inputs using Zod schemas
 - Returns structured, typed responses
@@ -391,6 +413,7 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 ### Code Style
 
 This project uses:
+
 - **Biome** for linting and formatting
 - **TypeScript** with strict mode
 - **2 spaces** for indentation
