@@ -36,6 +36,12 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - Stabilized Vitest ESM/CJS behavior in CI by using Node 20 and non-interactive test script.
 - Minor test flake fixes and formatting.
 
+## [1.1.2] - 2025-08-08
+
+### Fixed
+
+- CI npm provenance: grant GitHub OIDC `id-token: write` permission for publishing with provenance.
+
 ## [1.1.0] - 2025-08-08
 
 ### Added
@@ -55,6 +61,7 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Ignored `.cursor/` directory and removed committed files to avoid secret scanning violations.
 
-[Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/cloudbring/newrelic-mcp/releases/tag/v1.1.0
