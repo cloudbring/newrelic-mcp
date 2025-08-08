@@ -21,6 +21,21 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Planned: Minor bug fixes and DX improvements
 
+## [1.1.1] - 2025-08-08
+
+### Changed
+
+- CI now runs on Node 20 only; publishing gated on version change and allowed from `main` or `master`.
+- Added npm provenance, `engines.node >= 20`, and `prepack` build to ensure secure/consistent releases.
+- Refined Biome config: warn on `noExplicitAny` globally; disabled for tests via overrides.
+- Split large server edge-case tests into focused files (<100 lines) for faster runs and clarity.
+- Improved server constructor to allow injected client without requiring `NEW_RELIC_API_KEY` (testability).
+
+### Fixed
+
+- Stabilized Vitest ESM/CJS behavior in CI by using Node 20 and non-interactive test script.
+- Minor test flake fixes and formatting.
+
 ## [1.1.0] - 2025-08-08
 
 ### Added
@@ -41,4 +56,5 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - Ignored `.cursor/` directory and removed committed files to avoid secret scanning violations.
 
 [Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.0...HEAD
+[1.1.1]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/cloudbring/newrelic-mcp/releases/tag/v1.1.0
