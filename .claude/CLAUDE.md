@@ -187,3 +187,13 @@ npm run test:server     # Test server startup
 - Include usage examples
 - Keep API documentation current
 - Document any breaking changes
+
+## Changelog Standard
+
+- Maintain `CHANGELOG.md` following Keep a Changelog (v1.1.0) and Semantic Versioning.
+- Always add entries to `## [Unreleased]` during development; never edit past releases retroactively except to correct mistakes.
+- Group changes under the canonical headings: Added, Changed, Deprecated, Removed, Fixed, Security.
+- On release PRs, move `Unreleased` entries into a new `## [x.y.z] - YYYY-MM-DD` section and update link references at the bottom:
+  - `[Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/vx.y.z...HEAD`
+  - `[x.y.z]: https://github.com/cloudbring/newrelic-mcp/releases/tag/vx.y.z`
+- Release notes in GitHub should mirror the `CHANGELOG` for that version.

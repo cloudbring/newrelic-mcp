@@ -31,6 +31,7 @@ run-inspector.sh
 
 # Local documentation - keep locally but not in repo
 NEXT_STEPS.md
+PLAN.md
 
 # Cursor workspace
 .cursor/
