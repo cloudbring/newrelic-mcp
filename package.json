@@ -7,6 +7,13 @@
   "bin": {
     "newrelic-mcp": "./dist/server.js"
   },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "files": [
     "dist/",
     "README.md",
@@ -29,6 +36,7 @@
     "build": "tsc",
     "dev": "tsx src/server.ts",
     "start": "node dist/server.js",
+    "prepack": "npm run build",
     "test": "vitest",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
