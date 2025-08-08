@@ -19,7 +19,6 @@ List metric names and value names for a specific application host.
 - `host_id` (number, required)
 - `name` (string, optional) — filter metric names
 - `page` (number, optional)
-- `cursor` (string, optional)
 - `auto_paginate` (boolean, default false, optional)
 - `region` ("US" | "EU", default "US")
 
@@ -33,8 +32,7 @@ export const ListMetricNamesForHostParams = z.object({
   host_id: z.number().int().positive(),
   name: z.string().optional(),
   page: z.number().int().positive().optional(),
-  cursor: z.string().optional(),
-  auto_paginate: z.boolean().default(false).optional(),
+  auto_paginate: z.boolean().default(false),
   region: z.enum(["US", "EU"]).default("US"),
 });
 export type ListMetricNamesForHostParams = z.infer<typeof ListMetricNamesForHostParams>;

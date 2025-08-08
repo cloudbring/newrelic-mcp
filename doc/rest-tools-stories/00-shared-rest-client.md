@@ -39,7 +39,7 @@ graph TD
 
 ## Acceptance criteria
 
-- Single place to build URLs, set headers, and follow pagination.
+- Single place to build URLs, set headers, follow pagination, and map common error classes (401/403/404/429).
 - Reused by all REST tools.
 
 ## References

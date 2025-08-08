@@ -38,13 +38,19 @@ export const GetMetricDataForHostParams = z.object({
   host_id: z.number().int().positive(),
   names: z.array(z.string().min(1)).min(1),
   values: z.array(z.string().min(1)).optional(),
-  from: z.string().optional(),
-  to: z.string().optional(),
+  from: z
+    .string()
+    .refine((v) => !Number.isNaN(Date.parse(v)), { message: 'ISO-8601 expected' })
+    .optional(),
+  to: z
+    .string()
+    .refine((v) => !Number.isNaN(Date.parse(v)), { message: 'ISO-8601 expected' })
+    .optional(),
   period: z.number().int().positive().optional(),
   summarize: z.boolean().optional(),
   page: z.number().int().positive().optional(),
   cursor: z.string().optional(),
-  auto_paginate: z.boolean().default(false).optional(),
+  auto_paginate: z.boolean().default(false),
   region: z.enum(["US", "EU"]).default("US"),
 });
 export type GetMetricDataForHostParams = z.infer<typeof GetMetricDataForHostParams>;

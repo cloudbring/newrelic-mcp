@@ -6,8 +6,7 @@ Acknowledge an incident via REST, if the v2 API supports an update endpoint. If 
 
 ## Endpoint(s)
 
-- Candidate: `PUT /alerts_incidents/{id}.json` or similar — verify availability in Swagger
-- Base URLs: US `https://api.newrelic.com/v2/`, EU `https://api.eu.newrelic.com/v2/`
+**Blocked:** New Relic REST v2 does not provide an incident acknowledge endpoint. Use the NerdGraph mutation `aiIssuesAckIssue(issueId: ID!)` instead: [NerdGraph Issues API example](https://docs.newrelic.com/docs/apis/nerdgraph/examples/nerdgraph-issues-api-via-github/)
 
 ## Auth
 

@@ -6,8 +6,9 @@ List open alert incidents via REST v2.
 
 ## Endpoint(s)
 
-- GET `/alerts_incidents.json` (verify path/params in Swagger)
+- GET `/alerts_incidents.json` (supports `page` for pagination)
 - Base URLs: US `https://api.newrelic.com/v2/`, EU `https://api.eu.newrelic.com/v2/`
+  - Note: `only_open` and `priority` are not documented as server-side filters in REST v2; apply client-side filtering if needed.
 
 ## Auth
 
@@ -15,11 +16,10 @@ List open alert incidents via REST v2.
 
 ## Parameters
 
-- `only_open` (boolean, default true) — if supported; fallback to filtering client-side if not
-- `priority` ("CRITICAL" | "HIGH" | "MEDIUM" | "LOW", optional) — if supported
+- `only_open` (boolean, default true) — client-side filtering
+- `priority` ("CRITICAL" | "HIGH" | "MEDIUM" | "LOW", optional) — client-side filtering
 - `page` (number, optional)
-- `cursor` (string, optional)
-- `auto_paginate` (boolean, default false, optional)
+- `auto_paginate` (boolean, default false)
 - `region` ("US" | "EU", default "US")
 
 ## Zod schema (tool input)
@@ -28,11 +28,10 @@ List open alert incidents via REST v2.
 import { z } from "zod";
 
 export const ListOpenIncidentsParams = z.object({
-  only_open: z.boolean().default(true).optional(),
+  only_open: z.boolean().default(true),
   priority: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"]).optional(),
   page: z.number().int().positive().optional(),
-  cursor: z.string().optional(),
-  auto_paginate: z.boolean().default(false).optional(),
+  auto_paginate: z.boolean().default(false),
   region: z.enum(["US", "EU"]).default("US"),
 });
 export type ListOpenIncidentsParams = z.infer<typeof ListOpenIncidentsParams>;
@@ -50,7 +49,7 @@ graph TD
 
 ## Acceptance criteria
 
-- Returns incidents filtered to open ones (server- or client-side) with pagination metadata.
+- Returns incidents; if `only_open`/`priority` provided, apply client-side filtering. Include pagination metadata (Link rels and/or next page URL) when not auto-paginating.
 
 ## Test plan
 

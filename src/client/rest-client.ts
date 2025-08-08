@@ -58,15 +58,17 @@ export class NewRelicRestClient {
   private readonly region: Region;
 
   constructor(options: RestClientOptions) {
-    this.apiKey = options.apiKey;
-    this.region = options.region;
+    const parsed = RestClientOptions.parse(options);
+    this.apiKey = parsed.apiKey;
+    this.region = parsed.region;
   }
 
   private buildUrl(path: string, query?: Record<string, unknown>): string {
     const base = baseUrlForRegion(this.region);
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const hasJson = normalizedPath.endsWith('.json');
     const qs = serializeQuery(query);
-    return `${base}${normalizedPath}.json${qs}`;
+    return `${base}${hasJson ? normalizedPath : `${normalizedPath}.json`}${qs}`;
   }
 
   async get<T>(path: string, query?: Record<string, unknown>): Promise<RestResponse<T>> {

@@ -30,7 +30,7 @@ export const ListAlertPoliciesParams = z.object({
   filter_name: z.string().optional(),
   page: z.number().int().positive().optional(),
   cursor: z.string().optional(),
-  auto_paginate: z.boolean().default(false).optional(),
+  auto_paginate: z.boolean().default(false),
   region: z.enum(["US", "EU"]).default("US"),
 });
 export type ListAlertPoliciesParams = z.infer<typeof ListAlertPoliciesParams>;

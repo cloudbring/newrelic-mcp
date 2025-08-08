@@ -30,7 +30,7 @@ export const ListDeploymentsParams = z.object({
   application_id: z.number().int().positive(),
   page: z.number().int().positive().optional(),
   cursor: z.string().optional(),
-  auto_paginate: z.boolean().default(false).optional(),
+  auto_paginate: z.boolean().default(false),
   region: z.enum(["US", "EU"]).default("US"),
 });
 export type ListDeploymentsParams = z.infer<typeof ListDeploymentsParams>;

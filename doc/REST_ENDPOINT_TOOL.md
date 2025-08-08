@@ -5,18 +5,19 @@ This document summarizes key details from New Relic's REST v2 Swagger and propos
 References:
 
 - Swagger/OpenAPI: `https://api.newrelic.com/docs/swagger.yml` [source](https://api.newrelic.com/docs/swagger.yml)
+  - Note: this URL is dynamically served. Consider pinning a mirrored, versioned copy in this repo for long‑term stability.
 
 ## Key Notes from Swagger (internal details)
 
 - **Servers/Regions**: US `https://api.newrelic.com/v2/`, EU `https://api.eu.newrelic.com/v2/`, and a staging host. [source](https://api.newrelic.com/docs/swagger.yml)
-- **Auth header**: Uses a User API key via the `Api-Key`/`API-Key` header. The docs note that the older `X-API-KEY` header works for deprecated Account API keys but is deprecated in docs. Prefer a User API Key. [source](https://api.newrelic.com/docs/swagger.yml)
+- **Auth header**: Use a User API key via the `Api-Key` header. Legacy `X-Api-Key` may still be accepted in some docs/tools but should be avoided for new integrations. Prefer a User API key. [source](https://api.newrelic.com/docs/swagger.yml)
 - **Pagination**: Many endpoints are paginated and return RFC 5988 `Link` headers with `next`/`last`. Query param `page` is widely used; some endpoints also support a `cursor` param (replacing page). [source](https://api.newrelic.com/docs/swagger.yml)
 - **Common resources in spec**: Applications, Deployments, Hosts, Metrics (names + data), Alerts (policies, incidents, violations, conditions), Labels, Key transactions, Mobile apps, etc. [source](https://api.newrelic.com/docs/swagger.yml)
 - **Deployments**:
 
   - Create deployment: `POST /applications/{application_id}/deployments.json` requires `application_id` and `revision` (git SHA or similar). Optional `changelog`, `description`, `user`. [source](https://api.newrelic.com/docs/swagger.yml)
   - List deployments: `GET /applications/{application_id}/deployments.json` (paginated). [source](https://api.newrelic.com/docs/swagger.yml)
-  - Delete deployment: `DELETE /applications/{application_id}/deployments/{id}.json` requires Admin User’s API Key. [source](https://api.newrelic.com/docs/swagger.yml)
+  - Delete deployment: `DELETE /applications/{application_id}/deployments/{id}.json` requires a User API key with admin role permissions for the target account. [source](https://api.newrelic.com/docs/swagger.yml)
 
 - **Application hosts & metrics**:
 
@@ -124,8 +125,19 @@ Note: If broader metric coverage is needed (e.g., app‑level metrics endpoints)
 - Each tool will accept `region: "US" | "EU"` (default US) to select the base URL.
 - Support `page`, `cursor`, and `auto_paginate` (boolean) for list endpoints.
 - Common response envelope will include raw REST payload and pagination/link metadata.
-- Headers: send `Api-Key` (User API Key) and `Content-Type: application/json` as appropriate.
+- Headers: send `Api-Key` (User API key) and `Content-Type: application/json` (for writes). Also set `Accept: application/json` and a descriptive `User-Agent` (e.g., `newrelic-mcp-rest-client/<version>`).
 - Errors: surface HTTP status and body; map 401 to a clear “Invalid API key” message.
+
+### Rate limiting & retries
+
+- Detect `429 Too Many Requests`. If `Retry-After` is present, honor it; otherwise apply bounded exponential backoff with jitter on idempotent GETs.
+- Consider retrying transient 5xx responses for idempotent GET requests with conservative backoff.
+- Expose retry metadata (attempts, total delay) when retries occur.
+
+### Pagination details
+
+- Parse `Link` headers and follow `rel="next"` until exhausted when `auto_paginate` is true.
+- Include pagination metadata (e.g., next/last URLs from Link headers) in responses even when not auto-paginating.
 
 ## Implementation Plan (post‑approval)
 

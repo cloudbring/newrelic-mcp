@@ -11,7 +11,7 @@ Delete a deployment record for an APM application. This is a privileged action.
 
 ## Auth
 
-- Header: `Api-Key: <USER_API_KEY>` (Admin User’s API Key required)
+- Header: `Api-Key: <USER_API_KEY>` (User API key with admin role permissions required)
 
 ## Parameters
 
@@ -38,11 +38,11 @@ export type DeleteDeploymentParams = z.infer<typeof DeleteDeploymentParams>;
 
 - Refuses to call API unless `confirm === true`.
 - Sends DELETE with `Api-Key` header; selects base URL by `region`.
-- Returns success payload on 200; surfaces 401 and other errors clearly.
+- Returns success payload on 200; surfaces 401/403/404 clearly; maps other 4xx/5xx with status and snippet.
 
 ## Test plan
 
-- Unit tests: confirm must be true; invalid ids rejected; URL building; error mapping.
+- Unit tests: confirm must be true; invalid ids rejected; URL building; error mapping (401/403/404).
 
 ## References
 
