@@ -1,8 +1,21 @@
 import type { Mock } from 'vitest';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NewRelicClient } from '../../../src/client/newrelic-client';
 
-global.fetch = vi.fn();
+const originalFetch = global.fetch;
+
+beforeAll(() => {
+  // @ts-expect-error override in tests
+  global.fetch = vi.fn();
+});
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('NewRelicClient.validateCredentials', () => {
   let client: NewRelicClient;

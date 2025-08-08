@@ -165,30 +165,74 @@ export class NewRelicMCPServer {
           ...args,
           target_account_id: accountId,
         });
-      case 'acknowledge_incident':
-        return await new AlertTool(this.client).acknowledgeIncident(
-          args as {
-            incident_id: string;
-            comment?: string;
+      case 'acknowledge_incident': {
+        const { incident_id, comment } = args as Record<string, unknown>;
+        if (typeof incident_id !== 'string' || incident_id.trim() === '') {
+          throw new Error('acknowledge_incident: "incident_id" (non-empty string) is required');
+        }
+        if (comment !== undefined && typeof comment !== 'string') {
+          throw new Error('acknowledge_incident: "comment" must be a string when provided');
+        }
+        return await new AlertTool(this.client).acknowledgeIncident({
+          incident_id,
+          comment: comment as string | undefined,
+        });
+      }
+      case 'search_entities': {
+        const { query, entity_types } = args as Record<string, unknown>;
+        if (typeof query !== 'string' || query.trim() === '') {
+          throw new Error('search_entities: "query" (non-empty string) is required');
+        }
+        let types: string[] | undefined;
+        if (entity_types !== undefined) {
+          if (!Array.isArray(entity_types)) {
+            throw new Error('search_entities: "entity_types" must be an array of strings');
           }
-        );
-      case 'search_entities':
+          types = (entity_types as unknown[]).filter((t): t is string => typeof t === 'string');
+        }
         return await new EntityTool(this.client).searchEntities({
-          ...(args as { query: string; entity_types?: string[] }),
+          query,
+          entity_types: types,
           target_account_id: accountId,
         });
-      case 'get_entity_details':
-        return await new EntityTool(this.client).getEntityDetails(args as { entity_guid: string });
+      }
+      case 'get_entity_details': {
+        const { entity_guid } = args as Record<string, unknown>;
+        if (typeof entity_guid !== 'string' || entity_guid.trim() === '') {
+          throw new Error('get_entity_details: "entity_guid" (non-empty string) is required');
+        }
+        return await new EntityTool(this.client).getEntityDetails({ entity_guid });
+      }
       case 'list_synthetics_monitors':
         return await new SyntheticsTool(this.client).listSyntheticsMonitors({
           ...args,
           target_account_id: accountId,
         });
-      case 'create_browser_monitor':
+      case 'create_browser_monitor': {
+        const { name, url, frequency, locations } = args as Record<string, unknown>;
+        if (typeof name !== 'string' || name.trim() === '') {
+          throw new Error('create_browser_monitor: "name" (non-empty string) is required');
+        }
+        if (typeof url !== 'string' || url.trim() === '') {
+          throw new Error('create_browser_monitor: "url" (non-empty string) is required');
+        }
+        if (typeof frequency !== 'number' || !Number.isFinite(frequency) || frequency <= 0) {
+          throw new Error('create_browser_monitor: "frequency" (positive number) is required');
+        }
+        if (
+          !Array.isArray(locations) ||
+          (locations as unknown[]).some((l) => typeof l !== 'string')
+        ) {
+          throw new Error('create_browser_monitor: "locations" must be an array of strings');
+        }
         return await new SyntheticsTool(this.client).createBrowserMonitor({
-          ...(args as { name: string; url: string; frequency: number; locations: string[] }),
+          name,
+          url,
+          frequency,
+          locations: locations as string[],
           target_account_id: accountId,
         });
+      }
       case 'run_nerdgraph_query':
         return await new NerdGraphTool(this.client).execute(args);
       default: {

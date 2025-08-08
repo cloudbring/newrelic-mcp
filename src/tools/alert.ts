@@ -69,6 +69,9 @@ export class AlertTool {
     if (!accountId) {
       throw new Error('Account ID must be provided');
     }
+    if (!/^\d+$/.test(accountId)) {
+      throw new Error('Invalid account ID format');
+    }
 
     const query = `{
       actor {
@@ -106,6 +109,9 @@ export class AlertTool {
     const accountId = input.target_account_id;
     if (!accountId) {
       throw new Error('Account ID must be provided');
+    }
+    if (!/^\d+$/.test(accountId)) {
+      throw new Error('Invalid account ID format');
     }
 
     let filter = `accountId = '${accountId}' AND state = 'OPEN'`;

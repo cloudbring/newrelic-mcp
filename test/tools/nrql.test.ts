@@ -39,7 +39,9 @@ describe('NRQL Query Tool', () => {
         },
       };
 
-      mockClient.runNrqlQuery.mockResolvedValue(mockResults);
+      (mockClient.runNrqlQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+        mockResults
+      );
 
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction',
@@ -80,7 +82,9 @@ describe('NRQL Query Tool', () => {
     });
 
     it('should handle NRQL syntax errors', async () => {
-      mockClient.runNrqlQuery.mockRejectedValue(new Error('NRQL Syntax error: invalid query'));
+      (mockClient.runNrqlQuery as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('NRQL Syntax error: invalid query')
+      );
 
       await expect(
         tool.execute({
@@ -103,7 +107,9 @@ describe('NRQL Query Tool', () => {
         },
       };
 
-      mockClient.runNrqlQuery.mockResolvedValue(mockResults);
+      (mockClient.runNrqlQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+        mockResults
+      );
 
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction TIMESERIES',
@@ -126,7 +132,9 @@ describe('NRQL Query Tool', () => {
         },
       };
 
-      mockClient.runNrqlQuery.mockResolvedValue(mockResults);
+      (mockClient.runNrqlQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+        mockResults
+      );
 
       const result = await tool.execute({
         nrql: 'SELECT count(*) FROM Transaction FACET appName',
@@ -140,7 +148,9 @@ describe('NRQL Query Tool', () => {
 
   describe('Error Handling', () => {
     it('should handle API errors gracefully', async () => {
-      mockClient.runNrqlQuery.mockRejectedValue(new Error('API Error: Rate limit exceeded'));
+      (mockClient.runNrqlQuery as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new Error('API Error: Rate limit exceeded')
+      );
 
       await expect(
         tool.execute({

@@ -93,7 +93,7 @@ export const logRequest = (
   logger: winston.Logger,
   method: string,
   path: string,
-  metadata?: Record<string, unknown>
+  metadata: Record<string, unknown> = {}
 ) => {
   logger.info('Request received', {
     method,
@@ -106,7 +106,7 @@ export const logResponse = (
   logger: winston.Logger,
   statusCode: number,
   duration: number,
-  metadata?: Record<string, unknown>
+  metadata: Record<string, unknown> = {}
 ) => {
   logger.info('Response sent', {
     statusCode,
@@ -118,7 +118,7 @@ export const logResponse = (
 export const logError = (
   logger: winston.Logger,
   error: Error,
-  context?: Record<string, unknown>
+  context: Record<string, unknown> = {}
 ) => {
   logger.error('Error occurred', {
     error: {
@@ -135,7 +135,7 @@ export const logMetric = (
   metricName: string,
   value: number,
   unit: string,
-  metadata?: Record<string, unknown>
+  metadata: Record<string, unknown> = {}
 ) => {
   logger.info('Metric recorded', {
     metric: {
