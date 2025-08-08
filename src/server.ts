@@ -24,13 +24,15 @@ export class NewRelicMCPServer {
   private defaultAccountId?: string;
 
   constructor(client?: NewRelicClient) {
-    if (!process.env.NEW_RELIC_API_KEY) {
-      throw new Error('NEW_RELIC_API_KEY is required');
-    }
-
     this.defaultAccountId = process.env.NEW_RELIC_ACCOUNT_ID;
-    this.client =
-      client || new NewRelicClient(process.env.NEW_RELIC_API_KEY, this.defaultAccountId);
+    if (client) {
+      this.client = client;
+    } else {
+      if (!process.env.NEW_RELIC_API_KEY) {
+        throw new Error('NEW_RELIC_API_KEY is required');
+      }
+      this.client = new NewRelicClient(process.env.NEW_RELIC_API_KEY, this.defaultAccountId);
+    }
 
     this.server = new Server(
       {
