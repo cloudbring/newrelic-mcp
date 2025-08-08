@@ -17,6 +17,9 @@
   },
   "linter": {
     "enabled": true,
+    "domains": {
+      "test": "recommended"
+    },
     "rules": {
       "recommended": true,
       "style": {
@@ -29,7 +32,7 @@
         "noUnusedVariables": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "warn",
+        "noExplicitAny": "off",
         "noImplicitAnyLet": "error"
       },
       "complexity": {
