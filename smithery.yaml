@@ -1,4 +1,8 @@
 runtime: "typescript"
+entry: "src/server.ts"
+start:
+  command: ["node", "dist/server.js"]
+  port: 8000
 env:
   NODE_ENV: "production"
 

@@ -44,6 +44,8 @@
     "format:check": "npx ultracite lint",
     "ai:test": "vitest --run",
     "ai:test:watch": "vitest",
+    "ai:test:coverage": "vitest --coverage --run",
+    "ai:test:integration": "USE_REAL_ENV=true vitest --run",
     "ai:lint": "biome lint --max-diagnostics=none --reporter=summary .",
     "ai:check": "biome check --max-diagnostics=none --reporter=summary .",
     "ai:ci": "biome ci --max-diagnostics=none --reporter=summary .",

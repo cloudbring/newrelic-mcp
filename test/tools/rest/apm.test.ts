@@ -30,4 +30,31 @@ describe('REST APM Tool', () => {
     expect(get).toHaveBeenCalled();
     expect((out as any).items).toHaveLength(2);
   });
+
+  it('listApplications: no auto_paginate, maps host/language and page', async () => {
+    get.mockResolvedValueOnce({ status: 200, data: [{ id: 3 }], links: { next: 'ignored' } });
+    const tool = new RestApmTool();
+    const out = await tool.listApplications({
+      filter_host: 'host1',
+      filter_language: 'java',
+      page: 5,
+      auto_paginate: false,
+    });
+    expect((out as any).items).toBeDefined();
+    // Verify query keys used
+    const call = get.mock.calls[0];
+    expect(call[0]).toContain('/applications');
+    const query = call[1] as Record<string, unknown>;
+    expect(query['filter[host]']).toBe('host1');
+    expect(query['filter[language]']).toBe('java');
+    expect(query.page).toBe(5);
+  });
+
+  it('listApplications: empty filter_ids is ignored', async () => {
+    get.mockResolvedValueOnce({ status: 200, data: [], links: {} });
+    const tool = new RestApmTool();
+    await tool.listApplications({ filter_ids: [], auto_paginate: false });
+    const query = get.mock.calls[0][1] as Record<string, unknown>;
+    expect(query['filter[ids]']).toBeUndefined();
+  });
 });
