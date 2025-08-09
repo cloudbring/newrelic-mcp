@@ -31,6 +31,16 @@ describe('REST Metrics Tool', () => {
     expect((out as any).items).toHaveLength(2);
   });
 
+  it('listMetricNames: no auto_paginate returns first page only and respects page override', async () => {
+    get.mockResolvedValueOnce({ status: 200, data: [{ metric: 'Disk' }], links: { next: 'x' } });
+    const tool = new RestMetricsTool();
+    const out = await tool.listMetricNames({ application_id: 1, host_id: 2, page: 3 });
+    expect(Array.isArray((out as any).items)).toBeTruthy();
+    const call = get.mock.calls[0];
+    const query = call[1] as Record<string, unknown>;
+    expect(query.page).toBe(3);
+  });
+
   it('getMetricData: serializes arrays and paginates', async () => {
     get
       .mockResolvedValueOnce({
@@ -49,6 +59,31 @@ describe('REST Metrics Tool', () => {
     });
     expect(get).toHaveBeenCalled();
     expect((out as any).items).toHaveLength(2);
+  });
+
+  it('getMetricData: honors optional params and no auto_paginate', async () => {
+    get.mockResolvedValueOnce({ status: 200, data: [{ timeslices: [] }], links: { next: 'x' } });
+    const tool = new RestMetricsTool();
+    const out = await tool.getMetricData({
+      application_id: 1,
+      host_id: 2,
+      names: ['CPU'],
+      values: ['max'],
+      from: '2024-01-01T00:00:00Z',
+      to: '2024-01-01T01:00:00Z',
+      period: 60,
+      summarize: true,
+      page: 2,
+      auto_paginate: false,
+    });
+    expect(out).toBeDefined();
+    const call = get.mock.calls[0];
+    const query = call[1] as Record<string, unknown>;
+    expect(query.from).toBe('2024-01-01T00:00:00Z');
+    expect(query.to).toBe('2024-01-01T01:00:00Z');
+    expect(query.period).toBe(60);
+    expect(query.summarize).toBe(true);
+    expect(query.page).toBe(2);
   });
 
   it('listApplicationHosts: maps filter params', async () => {
