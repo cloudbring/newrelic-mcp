@@ -1,5 +1,7 @@
 # New Relic MCP Server
 
+ [![smithery badge](https://smithery.ai/badge/@cloudbring/newrelic-mcp)](https://smithery.ai/server/@cloudbring/newrelic-mcp)
+
 A Model Context Protocol (MCP) server that provides seamless integration with New Relic's observability platform. Query metrics, manage alerts, monitor applications, and interact with your entire observability stack through a simple, unified interface.
 
 > **Disclaimer**: This is an unofficial community project and is not affiliated with, endorsed by, or supported by New Relic, Inc. All trademarks are the property of their respective owners.
@@ -17,6 +19,8 @@ A Model Context Protocol (MCP) server that provides seamless integration with Ne
 ## Installation
 
 ### Quick Install with Smithery
+
+To install or deploy via Smithery, see the official docs: [Deployments](https://smithery.ai/docs/build/deployments), [Project Configuration](https://smithery.ai/docs/build/project-config), and [`smithery.yaml` Reference](https://smithery.ai/docs/build/project-config/smithery-yaml).
 
 To install New Relic MCP for Claude Desktop automatically via [Smithery](https://smithery.ai/mcp/newrelic-mcp):
 

@@ -31,10 +31,10 @@ export class NewRelicMCPServer {
     if (client) {
       this.client = client;
     } else {
-      if (!process.env.NEW_RELIC_API_KEY) {
-        throw new Error('NEW_RELIC_API_KEY is required');
-      }
-      this.client = new NewRelicClient(process.env.NEW_RELIC_API_KEY, this.defaultAccountId);
+      // Best practice for Smithery tool discovery: do not force auth at startup
+      // Allow listing tools without credentials; validate when tools are invoked
+      const apiKey = process.env.NEW_RELIC_API_KEY || '';
+      this.client = new NewRelicClient(apiKey, this.defaultAccountId);
     }
 
     this.server = new Server(
@@ -136,9 +136,12 @@ export class NewRelicMCPServer {
   }
 
   async start(): Promise<void> {
-    const isValid = await this.client.validateCredentials();
-    if (!isValid) {
-      throw new Error('Invalid New Relic API credentials');
+    // Only validate if credentials were provided; otherwise allow startup for tool discovery
+    if (process.env.NEW_RELIC_API_KEY) {
+      const isValid = await this.client.validateCredentials();
+      if (!isValid) {
+        throw new Error('Invalid New Relic API credentials');
+      }
     }
 
     const transport = new StdioServerTransport();
