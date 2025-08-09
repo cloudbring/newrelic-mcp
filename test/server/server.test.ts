@@ -94,11 +94,11 @@ describe('NewRelic MCP Server', () => {
   });
 
   describe('Environment Configuration', () => {
-    it('should require NEW_RELIC_API_KEY environment variable', () => {
+    it('should allow construction without NEW_RELIC_API_KEY (tool discovery)', () => {
       const originalEnv = process.env.NEW_RELIC_API_KEY;
       delete process.env.NEW_RELIC_API_KEY;
 
-      expect(() => new NewRelicMCPServer()).toThrow('NEW_RELIC_API_KEY is required');
+      expect(() => new NewRelicMCPServer()).not.toThrow();
 
       process.env.NEW_RELIC_API_KEY = originalEnv;
     });
