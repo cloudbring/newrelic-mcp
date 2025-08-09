@@ -38,6 +38,10 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Server wiring to register new REST tools alongside existing NerdGraph tools.
 
+### Breaking changes
+
+- No breaking changes. Existing tool names and behaviors remain intact; this release adds new REST tools alongside the current NerdGraph tools.
+
 ### Notes
 
 - Acknowledge incident via REST is not supported; continue using NerdGraph (`aiIssuesAckIssue`).
