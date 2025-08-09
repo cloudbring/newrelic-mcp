@@ -55,29 +55,41 @@ describe('NewRelic MCP Server', () => {
     });
 
     it('should validate New Relic API credentials on start', async () => {
-      await server.start();
-      expect(mockClient.validateCredentials).toHaveBeenCalled();
+      const originalApiKey = process.env.NEW_RELIC_API_KEY;
+      process.env.NEW_RELIC_API_KEY = 'test-key';
+      try {
+        await server.start();
+        expect(mockClient.validateCredentials).toHaveBeenCalled();
+      } finally {
+        process.env.NEW_RELIC_API_KEY = originalApiKey;
+      }
     });
 
     it('should throw error if API credentials are invalid', async () => {
-      mockClient.validateCredentials = vi.fn().mockResolvedValue(false);
-      await expect(server.start()).rejects.toThrow('Invalid New Relic API credentials');
+      const originalApiKey = process.env.NEW_RELIC_API_KEY;
+      process.env.NEW_RELIC_API_KEY = 'test-key';
+      try {
+        mockClient.validateCredentials = vi.fn().mockResolvedValue(false);
+        await expect(server.start()).rejects.toThrow('Invalid New Relic API credentials');
+      } finally {
+        process.env.NEW_RELIC_API_KEY = originalApiKey;
+      }
     });
   });
 
   describe('Tool Registration', () => {
     it('should register NRQL query tool with correct schema', () => {
-      const tool = server.getTool('run_nrql_query');
+      const tool = server.getTool('run_nrql_query') as any;
       expect(tool).toBeDefined();
       expect(tool.name).toBe('run_nrql_query');
       expect(tool.description).toContain('NRQL');
       expect(tool.inputSchema).toHaveProperty('properties.nrql');
-      expect(tool.inputSchema.properties.nrql.type).toBe('string');
+      expect((tool.inputSchema as any).properties.nrql.type).toBe('string');
       expect(tool.inputSchema.required).toContain('nrql');
     });
 
     it('should register APM applications tool with correct schema', () => {
-      const tool = server.getTool('list_apm_applications');
+      const tool = server.getTool('list_apm_applications') as any;
       expect(tool).toBeDefined();
       expect(tool.name).toBe('list_apm_applications');
       expect(tool.description).toContain('APM');
@@ -85,7 +97,7 @@ describe('NewRelic MCP Server', () => {
     });
 
     it('should register entity search tool with correct schema', () => {
-      const tool = server.getTool('search_entities');
+      const tool = server.getTool('search_entities') as any;
       expect(tool).toBeDefined();
       expect(tool.name).toBe('search_entities');
       expect(tool.inputSchema).toHaveProperty('properties.query');

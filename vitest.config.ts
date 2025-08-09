@@ -10,11 +10,10 @@ export default defineConfig({
       './test/setup/vitest-hooks.ts', // Enable telemetry hooks for New Relic monitoring
     ],
     include: ['test/**/*.test.ts', 'test/**/*.spec.ts'],
-    exclude: ['node_modules', 'dist'],
+    exclude: ['node_modules/', 'dist/'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'test/', 'dist/', '*.config.ts', '**/*.eval.ts'],
     },
     // Test timeout for OpenTelemetry operations
     testTimeout: 10000,
