@@ -21,6 +21,31 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Planned: Minor bug fixes and DX improvements
 
+## [2.0.0] - 2025-08-09
+
+### Added
+
+- New REST v2 client (`src/client/rest-client.ts`) with region-aware base URL, auth headers, query serialization, and RFC 5988 Link parsing.
+- REST tools:
+  - Deployments: create, list (auto-paginate), delete with confirm.
+  - APM applications: list with filters and auto-pagination.
+  - Metrics: list metric names for host; get metric data for host; list application hosts (auto-paginate).
+  - Alerts (REST): list policies; list incidents with client-side filtering for open/priority.
+- Unit tests for all REST tools and helpers; integration tests for REST client against US/EU endpoints (conditionally skipped without creds).
+- Documentation: consolidated under `docs/` with a pinned Swagger guidance and per-tool stories.
+
+### Changed
+
+- Server wiring to register new REST tools alongside existing NerdGraph tools.
+
+### Breaking changes
+
+- No breaking changes. Existing tool names and behaviors remain intact; this release adds new REST tools alongside the current NerdGraph tools.
+
+### Notes
+
+- Acknowledge incident via REST is not supported; continue using NerdGraph (`aiIssuesAckIssue`).
+
 ## [1.1.1] - 2025-08-08
 
 ### Changed
@@ -61,7 +86,8 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Ignored `.cursor/` directory and removed committed files to avoid secret scanning violations.
 
-[Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/cloudbring/newrelic-mcp/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.2...v2.0.0
 [1.1.2]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/cloudbring/newrelic-mcp/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/cloudbring/newrelic-mcp/releases/tag/v1.1.0
