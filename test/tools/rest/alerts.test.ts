@@ -41,4 +41,25 @@ describe('REST Alerts Tool', () => {
     expect((out as any).items).toHaveLength(1);
     expect((out as any).items[0].id).toBe(1);
   });
+
+  it('listIncidents: returns first page without auto_paginate and no filters', async () => {
+    get.mockResolvedValueOnce({
+      status: 200,
+      data: [{ id: 10, priority: 'MEDIUM', closed_at: 0 }],
+      links: { next: 'ignored-when-no-auto' },
+    });
+    const tool = new RestAlertsTool();
+    const out = await tool.listIncidents({ auto_paginate: false });
+    expect(Array.isArray((out as any).items)).toBeTruthy();
+    expect((out as any).items).toHaveLength(1);
+    expect((out as any).items[0].id).toBe(10);
+  });
+
+  it('getListPoliciesTool/getListIncidentsTool: definitions are created (schema lines covered)', () => {
+    const tool = new RestAlertsTool();
+    const policiesTool = tool.getListPoliciesTool();
+    const incidentsTool = tool.getListIncidentsTool();
+    expect(policiesTool.name).toBe('list_alert_policies_rest');
+    expect(incidentsTool.name).toBe('list_open_incidents_rest');
+  });
 });

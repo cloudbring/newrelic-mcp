@@ -14,6 +14,8 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.ts'],
+      exclude: ['node_modules/', 'dist/', 'test/', '*.config.ts', '**/*.eval.ts', 'src/**/*.d.ts'],
     },
     // Test timeout for OpenTelemetry operations
     testTimeout: 10000,
