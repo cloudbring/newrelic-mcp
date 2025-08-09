@@ -15,6 +15,9 @@ import { ApmTool } from './tools/apm';
 import { EntityTool } from './tools/entity';
 import { NerdGraphTool } from './tools/nerdgraph';
 import { NrqlTool } from './tools/nrql';
+import { RestApmTool } from './tools/rest/apm';
+import { RestDeploymentsTool } from './tools/rest/deployments';
+import { RestMetricsTool } from './tools/rest/metrics';
 import { SyntheticsTool } from './tools/synthetics';
 
 export class NewRelicMCPServer {
@@ -58,6 +61,9 @@ export class NewRelicMCPServer {
     const alertTool = new AlertTool(this.client);
     const syntheticsTool = new SyntheticsTool(this.client);
     const nerdGraphTool = new NerdGraphTool(this.client);
+    const restDeployments = new RestDeploymentsTool();
+    const restApm = new RestApmTool();
+    const restMetrics = new RestMetricsTool();
 
     // Register all tools
     const tools = [
@@ -71,6 +77,14 @@ export class NewRelicMCPServer {
       syntheticsTool.getListMonitorsTool(),
       syntheticsTool.getCreateMonitorTool(),
       nerdGraphTool.getQueryTool(),
+      // REST v2 tools
+      restDeployments.getCreateTool(),
+      restDeployments.getListTool(),
+      restDeployments.getDeleteTool(),
+      restApm.getListApplicationsTool(),
+      restMetrics.getListMetricNamesTool(),
+      restMetrics.getMetricDataTool(),
+      restMetrics.getListApplicationHostsTool(),
       {
         name: 'get_account_details',
         description: 'Get New Relic account details',
@@ -155,6 +169,34 @@ export class NewRelicMCPServer {
           ...args,
           target_account_id: accountId,
         });
+      case 'create_deployment':
+        return await new RestDeploymentsTool().create(
+          args as Parameters<RestDeploymentsTool['create']>[0]
+        );
+      case 'list_deployments_rest':
+        return await new RestDeploymentsTool().list(
+          args as Parameters<RestDeploymentsTool['list']>[0]
+        );
+      case 'delete_deployment':
+        return await new RestDeploymentsTool().delete(
+          args as Parameters<RestDeploymentsTool['delete']>[0]
+        );
+      case 'list_apm_applications_rest':
+        return await new RestApmTool().listApplications(
+          args as Parameters<RestApmTool['listApplications']>[0]
+        );
+      case 'list_metric_names_for_host':
+        return await new RestMetricsTool().listMetricNames(
+          args as Parameters<RestMetricsTool['listMetricNames']>[0]
+        );
+      case 'get_metric_data_for_host':
+        return await new RestMetricsTool().getMetricData(
+          args as Parameters<RestMetricsTool['getMetricData']>[0]
+        );
+      case 'list_application_hosts':
+        return await new RestMetricsTool().listApplicationHosts(
+          args as Parameters<RestMetricsTool['listApplicationHosts']>[0]
+        );
       case 'get_account_details':
         return await this.client.getAccountDetails(accountId);
       case 'list_alert_policies':
