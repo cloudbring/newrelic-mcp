@@ -28,6 +28,43 @@ To install New Relic MCP for Claude Desktop automatically via [Smithery](https:/
 npx @smithery/cli install newrelic-mcp --client claude
 ```
 
+### Smithery CLI (recommended)
+
+We recommend the Smithery CLI for local development, inspection, and deployment flows. Benefits:
+
+- Unified dev/build/deploy workflow, client‑agnostic
+- Dev server with hot‑reload and playground (optional tunnel)
+- Build bundles for `stdio` or `shttp` transports
+- Inspect a server interactively; run with supplied config
+- Simple install per client
+
+Examples:
+
+```bash
+# Hot‑reload dev server
+npx @smithery/cli dev src/server.ts --port 8181 --no-open
+
+# Build production bundle (shttp transport)
+npx @smithery/cli build src/server.ts --out .smithery/index.cjs --transport shttp
+
+# Inspect a published server
+npx @smithery/cli inspect @cloudbring/newrelic-mcp
+
+# Run with config (env via JSON)
+npx @smithery/cli run @cloudbring/newrelic-mcp --config '{"NEW_RELIC_API_KEY":"...","NEW_RELIC_ACCOUNT_ID":"..."}'
+
+# Install into a specific client
+npx @smithery/cli install newrelic-mcp --client claude
+
+# Open playground
+npx @smithery/cli playground --port 3001
+```
+
+Notes:
+
+- This repo includes a minimal `smithery.yaml` with `runtime: "typescript"` to align with TypeScript‑first deployments.
+- See the CLI reference for all commands and flags: [smithery-ai/cli](https://github.com/smithery-ai/cli).
+
 ### Manual Installation
 
 <details>
