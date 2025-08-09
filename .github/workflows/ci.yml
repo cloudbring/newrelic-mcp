@@ -38,7 +38,7 @@ jobs:
         env:
           USE_REAL_ENV: ${{ vars.USE_REAL_ENV }}
           NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
-          NEW_RELIC_ACCOUNT_ID: ${{ secrets.NEW_RELIC_ACCOUNT_ID }}
+          NEW_RELIC_ACCOUNT_ID: ${{ vars.NEW_RELIC_ACCOUNT_ID }}
         run: npm run ai:test
 
       - name: Check test coverage (with thresholds)
