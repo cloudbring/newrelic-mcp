@@ -209,6 +209,12 @@ npm run build
 - `NEW_RELIC_API_KEY` - Your New Relic User API Key (required)
 - `NEW_RELIC_ACCOUNT_ID` - Your New Relic Account ID (optional, can be provided per tool call)
 
+### Optional Environment Variables
+
+- `NEW_RELIC_API_REGION` - API region selection (default: `us`)
+  - `us` - United States region: `https://api.newrelic.com/graphql`
+  - `eu` - European region: `https://api.eu.newrelic.com/graphql`
+
 ### Getting Your New Relic Credentials
 
 1. **API Key**:
