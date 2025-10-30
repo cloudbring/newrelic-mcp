@@ -1,7 +1,18 @@
-const NERDGRAPH_URL = 'https://api.newrelic.com/graphql';
+const NERDGRAPH_URLS = {
+  us: 'https://api.newrelic.com/graphql',
+  eu: 'https://api.eu.newrelic.com/graphql',
+} as const;
 
 type GraphQLError = { message: string; [key: string]: unknown };
 type GraphQLResponse<T> = { data?: T; errors?: GraphQLError[] };
+
+function getNerdGraphUrl(): string {
+  const region = (process.env.NEW_RELIC_API_REGION || 'us').toLowerCase();
+  if (region === 'eu') {
+    return NERDGRAPH_URLS.eu;
+  }
+  return NERDGRAPH_URLS.us;
+}
 
 export interface NrqlQueryResult {
   results: Array<Record<string, unknown>>;
@@ -34,10 +45,12 @@ export interface ApmApplication {
 export class NewRelicClient {
   private apiKey: string;
   private defaultAccountId?: string;
+  private nerdGraphUrl: string;
 
   constructor(apiKey?: string, defaultAccountId?: string) {
     this.apiKey = apiKey || process.env.NEW_RELIC_API_KEY || '';
     this.defaultAccountId = defaultAccountId || process.env.NEW_RELIC_ACCOUNT_ID;
+    this.nerdGraphUrl = getNerdGraphUrl();
   }
 
   async validateCredentials(): Promise<boolean> {
@@ -254,7 +267,7 @@ export class NewRelicClient {
       throw new Error('NEW_RELIC_API_KEY environment variable is not set');
     }
 
-    const response = await fetch(NERDGRAPH_URL, {
+    const response = await fetch(this.nerdGraphUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
