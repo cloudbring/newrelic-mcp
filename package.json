@@ -1,11 +1,18 @@
 {
   "name": "newrelic-mcp",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Model Context Protocol server for New Relic observability platform integration",
   "module": "./src/server.ts",
   "main": "dist/server.js",
   "bin": {
     "newrelic-mcp": "./dist/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "files": [
     "dist/",
@@ -29,6 +36,7 @@
     "build": "tsc",
     "dev": "tsx src/server.ts",
     "start": "node dist/server.js",
+    "prepack": "npm run build",
     "test": "vitest",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

@@ -27,6 +27,7 @@ describe('NewRelicRestClient url building', () => {
   it('appends .json and query correctly', () => {
     const client = new NewRelicRestClient({ apiKey: 'k', region: 'US' });
     // @ts-expect-error private method access not allowed; build via public get
+    // biome-ignore lint/complexity/useLiteralKeys: bracket access is required to reach a private method in tests
     const url = client['buildUrl']('/applications', { page: 2 });
     expect(url).toContain('/applications.json');
     expect(url).toContain('page=2');

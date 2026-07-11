@@ -1,97 +1,58 @@
 # Publishing Guide for New Relic MCP Server
 
-This guide walks through publishing the New Relic MCP server to various platforms.
+This guide documents the secure and automated publishing process for the New Relic MCP server.
 
-## 1. GitHub Repository Setup
+## 1) CI-based automated releases (recommended)
 
-### Create New Repository
-1. Go to https://github.com/new
-2. Create repository: `cloudbring/newrelic-mcp`
-3. Make it public
-4. **DON'T** initialize with README (we already have one)
+Releases are automated via GitHub Actions and npm provenance.
 
-### Update Local Repository
+What happens on push to `main`:
+- CI runs tests, lint, typecheck, and build on Node 20.
+- If `package.json` version differs from the version on npm, CI publishes the package with provenance and creates a GitHub Release with notes extracted from `CHANGELOG.md`.
+
+Prerequisites
+- In GitHub repo: Settings → Actions → General → Workflow permissions: Read and write permissions
+- Secret: `NPM_TOKEN` (npm automation token, not a personal token)
+- Optional: Repository variables for integration tests (e.g. `USE_REAL_ENV`, `NEW_RELIC_API_KEY`, `NEW_RELIC_ACCOUNT_ID`)
+
+Security and best practices
+- `package.json` enforces `"engines": { "node": ">=20" }` and `publishConfig.provenance: true`.
+- Publishing uses an npm automation token via `NODE_AUTH_TOKEN` in CI.
+- Only publishes from `main` and only when the version changes.
+
+How to cut a release
+1. Update `CHANGELOG.md` (Keep a Changelog) by moving items from Unreleased to a new version section.
+2. Bump the version using semantic versioning:
+   ```bash
+   # choose one of: patch | minor | major
+   npm version patch
+   git push origin main --tags
+   ```
+3. CI will:
+   - Validate (tests/lint/typecheck/build)
+   - Publish to npm (if version changed)
+   - Create a GitHub Release with notes from the changelog
+
+Notes
+- A prepack step builds the package before publish.
+- Binary is exposed via `bin.newrelic-mcp` → `dist/server.js`. Ensure the built file is executable and contains a shebang (`#!/usr/bin/env node`). If needed, add it to `src/server.ts`'s first line and rebuild.
+
+## 2) Manual publish (fallback)
+
+Use only when CI is unavailable. Prefer automated releases above.
+
 ```bash
-# Remove old remote
-git remote remove gh
-
-# Add new remote
-git remote add origin git@github.com:cloudbring/newrelic-mcp.git
-
-# Push all branches and tags
-git push -u origin main
-git push --tags
-```
-
-### Enable GitHub Actions
-1. Go to Settings → Actions → General
-2. Set "Workflow permissions" to "Read and write permissions"
-3. Save
-
-### Add NPM Token for Auto-Publishing
-1. Get NPM token (see section 2)
-2. Go to Settings → Secrets and variables → Actions
-3. Add new secret: `NPM_TOKEN` with your npm token
-
-## 2. NPM Package Publishing
-
-### Initial Setup
-1. Create NPM account at https://www.npmjs.com/signup
-2. Login locally:
-```bash
-npm login
-```
-
-### Generate NPM Token
-```bash
-# Generate automation token for CI/CD
-npm token create --read-only=false --cidr=0.0.0.0/0
-```
-Save this token for GitHub Actions (NPM_TOKEN secret)
-
-### Prepare Package
-```bash
-# Ensure package is built
+npm ci
 npm run build
 
-# Test locally that it works
-node dist/server.js
-
-# Make bin executable
-chmod +x dist/server.js
-```
-
-### Add Shebang to Server
-Edit `src/server.ts` and add at the very top:
-```typescript
-#!/usr/bin/env node
-```
-
-Then rebuild:
-```bash
-npm run build
-```
-
-### Publish to NPM
-```bash
-# Dry run to see what will be published
+# optional dry run
 npm publish --dry-run
 
-# Publish for real
-npm publish --access public
+# publish (public package with provenance)
+NPM_CONFIG_PROVENANCE=true npm publish --access public
 ```
 
-### Test Installation
-```bash
-# Test global installation
-npm install -g newrelic-mcp
-newrelic-mcp
-
-# Test npx
-npx newrelic-mcp
-```
-
-## 3. Smithery Setup
+## 3) Smithery Setup
 
 ### Prerequisites
 - Published NPM package
@@ -163,7 +124,7 @@ Add to appropriate section:
 ### Claude Desktop App Store (Future)
 When Anthropic launches an app store, ensure you're registered.
 
-## 5. Version Management
+## 4. Version Management
 
 ### Semantic Versioning
 Use semantic versioning (MAJOR.MINOR.PATCH):
@@ -172,17 +133,22 @@ Use semantic versioning (MAJOR.MINOR.PATCH):
 - PATCH: Bug fixes
 
 ### Release Process
+Use semantic versioning and keep `CHANGELOG.md` in sync with releases (Keep a Changelog).
+
 ```bash
+# Update CHANGELOG.md (move Unreleased → new version section)
+
 # Update version
 npm version patch  # or minor/major
 
-# This creates a git tag
+# Push and tag
 git push origin main --tags
 
-# GitHub Actions will auto-publish to NPM
+# GitHub Actions (CI) will build, test, publish (if version changed),
+# and create a GitHub Release with notes from CHANGELOG.md
 ```
 
-## 6. Marketing & Documentation
+## 5. Marketing & Documentation
 
 ### Create Launch Post
 1. Write blog post/tweet announcing the MCP server
@@ -206,7 +172,7 @@ Consider creating:
 - Video tutorial
 - Example notebooks
 
-## 7. Monitoring
+## 6. Monitoring
 
 ### NPM Statistics
 Check downloads at: https://www.npmjs.com/package/newrelic-mcp

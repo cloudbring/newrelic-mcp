@@ -21,12 +21,12 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Planned: Minor bug fixes and DX improvements
 
-## [2.0.1] - TBD
+## [2.1.0] - 2026-07-11
 
 ### Added
 
-- Regional support for NerdGraph API endpoints (US and EU)
-- `NEW_RELIC_REGION` environment variable to configure data center region
+- Regional support for NerdGraph API endpoints (US and EU) (#23, thanks @vksjangra)
+- `NEW_RELIC_REGION` environment variable to configure data center region (closes #20)
 - Region-aware URL selection for all NerdGraph operations
 
 ### Changed
@@ -36,11 +36,14 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - Updated `smithery.json` to document `NEW_RELIC_REGION` environment variable
 - Updated README with examples for both US and EU regions
 - Added test utilities: added region helpers into shared `test/utils/region-helpers.ts`
+- Release hardening: Node >=20 engines requirement, npm provenance, `prepack` build
+- Corrected README installation command (#21, thanks @gesposito)
 
 ### Fixed
 
 - Fixed NerdGraph API calls to work correctly for EU region accounts
 - All NerdGraph tools now respect regional configuration
+- Fixed region test asserting env-derived URL against a hardcoded EU client
 
 ## [2.0.0] - 2025-08-09
 
