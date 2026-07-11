@@ -1,6 +1,7 @@
 {
   "name": "newrelic-mcp",
-  "version": "2.1.0",
+  "version": "2.1.1",
+  "mcpName": "io.github.cloudbring/newrelic-mcp",
   "description": "Model Context Protocol server for New Relic observability platform integration",
   "module": "./src/server.ts",
   "main": "dist/server.js",

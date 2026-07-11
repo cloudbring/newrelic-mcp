@@ -21,6 +21,19 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 - Planned: Minor bug fixes and DX improvements
 
+## [2.1.1] - 2026-07-11
+
+### Added
+
+- `mcpName` (`io.github.cloudbring/newrelic-mcp`) in package.json and `server.json`
+  for publication to the official MCP Registry (registry.modelcontextprotocol.io)
+
+### Changed
+
+- README installation section rewritten for 2026: npx-first, MCP Registry listing,
+  current Smithery CLI syntax (the 2025 `@smithery/cli install` flow and hosted
+  stdio deployments no longer exist)
+
 ## [2.1.0] - 2026-07-11
 
 ### Added
