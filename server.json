@@ -1,0 +1,43 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.cloudbring/newrelic-mcp",
+  "description": "MCP server for New Relic observability - NRQL queries, APM, alerts, entities, dashboards via NerdGraph and REST v2 (US and EU regions)",
+  "repository": {
+    "url": "https://github.com/cloudbring/newrelic-mcp",
+    "source": "github"
+  },
+  "version": "2.1.1",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "newrelic-mcp",
+      "version": "2.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "NEW_RELIC_API_KEY",
+          "description": "Your New Relic API key",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "NEW_RELIC_ACCOUNT_ID",
+          "description": "Your New Relic account ID (optional, can be provided per tool call)",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        },
+        {
+          "name": "NEW_RELIC_REGION",
+          "description": "New Relic data center region: US (default) or EU",
+          "isRequired": false,
+          "isSecret": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

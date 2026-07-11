@@ -1,6 +1,6 @@
 # New Relic MCP Server
 
- [![smithery badge](https://smithery.ai/badge/@cloudbring/newrelic-mcp)](https://smithery.ai/server/@cloudbring/newrelic-mcp)
+ [![smithery badge](https://smithery.ai/badge/@cloudbring/newrelic-mcp)](https://smithery.ai/servers/cloudbring/newrelic-mcp)
 
 A Model Context Protocol (MCP) server that provides seamless integration with New Relic's observability platform. Query metrics, manage alerts, monitor applications, and interact with your entire observability stack through a simple, unified interface.
 
@@ -18,52 +18,35 @@ A Model Context Protocol (MCP) server that provides seamless integration with Ne
 
 ## Installation
 
-### Quick Install with Smithery
+### npx (quickest)
 
-To install or deploy via Smithery, see the official docs: [Deployments](https://smithery.ai/docs/build/deployments), [Project Configuration](https://smithery.ai/docs/build/project-config), and [`smithery.yaml` Reference](https://smithery.ai/docs/build/project-config/smithery-yaml).
-
-To install New Relic MCP for Claude Desktop automatically via [Smithery](https://smithery.ai/mcp/newrelic-mcp):
+The package runs directly from npm — no install step:
 
 ```bash
-npx @smithery/cli install @cloudbring/newrelic-mcp --client claude
+NEW_RELIC_API_KEY=your-key npx -y newrelic-mcp
 ```
 
-### Smithery CLI (recommended)
+EU-region accounts: also set `NEW_RELIC_REGION=EU`.
 
-We recommend the Smithery CLI for local development, inspection, and deployment flows. Benefits:
+### MCP Registry
 
-- Unified dev/build/deploy workflow, client‑agnostic
-- Dev server with hot‑reload and playground (optional tunnel)
-- Build bundles for `stdio` or `shttp` transports
-- Inspect a server interactively; run with supplied config
-- Simple install per client
+Listed in the official [MCP Registry](https://registry.modelcontextprotocol.io) as
+`io.github.cloudbring/newrelic-mcp` — clients and directories that sync from the
+registry (e.g. PulseMCP) pick it up from there. Server metadata lives in
+[`server.json`](./server.json).
 
-Examples:
+### Smithery
+
+The [Smithery listing](https://smithery.ai/servers/cloudbring/newrelic-mcp) predates
+Smithery's move away from hosted stdio servers; the modern equivalent of the old
+`@smithery/cli install` flow is:
 
 ```bash
-# Hot‑reload dev server
-npx @smithery/cli dev src/server.ts --port 8181 --no-open
-
-# Build production bundle (shttp transport)
-npx @smithery/cli build src/server.ts --out .smithery/index.cjs --transport shttp
-
-# Inspect a published server
-npx @smithery/cli inspect @cloudbring/newrelic-mcp
-
-# Run with config (env via JSON)
-npx @smithery/cli run @cloudbring/newrelic-mcp --config '{"NEW_RELIC_API_KEY":"...","NEW_RELIC_ACCOUNT_ID":"...","NEW_RELIC_REGION":"US"}'
-
-# Install into a specific client
-npx @smithery/cli install newrelic-mcp --client claude
-
-# Open playground
-npx @smithery/cli playground --port 3001
+npx smithery mcp add @cloudbring/newrelic-mcp
 ```
 
-Notes:
-
-- This repo includes a minimal `smithery.yaml` with `runtime: "typescript"` to align with TypeScript‑first deployments.
-- See the CLI reference for all commands and flags: [smithery-ai/cli](https://github.com/smithery-ai/cli).
+(The `smithery.yaml`/`smithery.json` files in this repo are from the 2025 deploy
+model and are kept for the listing's history.)
 
 ### Manual Installation
 
