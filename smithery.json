@@ -14,8 +14,17 @@
   },
   "env": {
     "NEW_RELIC_API_KEY": {
-      "description": "Your New Relic API key",
-      "required": true,
+      "description": "Your New Relic User API key (not needed when using a system identity)",
+      "required": false,
+      "secret": true
+    },
+    "NEW_RELIC_CLIENT_ID": {
+      "description": "System identity client ID (alternative to the API key)",
+      "required": false
+    },
+    "NEW_RELIC_PRIVATE_KEY": {
+      "description": "System identity RSA private key (PEM)",
+      "required": false,
       "secret": true
     },
     "NEW_RELIC_ACCOUNT_ID": {

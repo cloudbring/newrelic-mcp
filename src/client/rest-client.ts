@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { z } from 'zod';
+import type { AuthProvider } from './auth';
 
 export const RestClientOptions = z.object({
   apiKey: z.string().min(1),
   region: z.enum(['US', 'EU']).default('US'),
 });
 export type RestClientOptions = z.infer<typeof RestClientOptions>;
+
+export type RestClientInit = { auth: AuthProvider; region?: 'US' | 'EU' } | RestClientOptions;
 
 export type Region = 'US' | 'EU';
 
@@ -54,13 +57,24 @@ export interface RestResponse<T> {
 }
 
 export class NewRelicRestClient {
-  private readonly apiKey: string;
+  private readonly apiKey?: string;
+  private readonly auth?: AuthProvider;
   private readonly region: Region;
 
-  constructor(options: RestClientOptions) {
-    const parsed = RestClientOptions.parse(options);
-    this.apiKey = parsed.apiKey;
-    this.region = parsed.region;
+  constructor(options: RestClientInit) {
+    if ('auth' in options) {
+      this.auth = options.auth;
+      this.region = options.region ?? 'US';
+    } else {
+      const parsed = RestClientOptions.parse(options);
+      this.apiKey = parsed.apiKey;
+      this.region = parsed.region;
+    }
+  }
+
+  private async headers(): Promise<Record<string, string>> {
+    const auth = this.auth ? await this.auth.getHeaders() : { 'Api-Key': this.apiKey as string };
+    return { 'Content-Type': 'application/json', ...auth };
   }
 
   private buildUrl(path: string, query?: Record<string, unknown>): string {
@@ -75,10 +89,7 @@ export class NewRelicRestClient {
     const url = this.buildUrl(path, query);
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-Key': this.apiKey,
-      },
+      headers: await this.headers(),
     });
     const links = parseLinkHeader(response.headers.get('link'));
     const data = (await response.json()) as T;
@@ -92,10 +103,7 @@ export class NewRelicRestClient {
     const url = this.buildUrl(path);
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-Key': this.apiKey,
-      },
+      headers: await this.headers(),
       body: JSON.stringify(body),
     });
     const links = parseLinkHeader(response.headers.get('link'));
@@ -110,10 +118,7 @@ export class NewRelicRestClient {
     const url = this.buildUrl(path);
     const response = await fetch(url, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Api-Key': this.apiKey,
-      },
+      headers: await this.headers(),
     });
     const links = parseLinkHeader(response.headers.get('link'));
     const data = (await response.json()) as T;

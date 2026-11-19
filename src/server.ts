@@ -9,6 +9,11 @@ import {
   McpError,
   type Tool,
 } from '@modelcontextprotocol/sdk/types.js';
+import {
+  type AuthProvider,
+  createAuthProviderFromEnv,
+  createRestAuthProvider,
+} from './client/auth';
 import { NewRelicClient } from './client/newrelic-client';
 import { AlertTool } from './tools/alert';
 import { ApmTool } from './tools/apm';
@@ -25,17 +30,20 @@ export class NewRelicMCPServer {
   private client: NewRelicClient;
   private tools: Map<string, Tool>;
   private defaultAccountId?: string;
+  private auth: AuthProvider;
+  private restAuth: AuthProvider;
 
   constructor(client?: NewRelicClient) {
     this.defaultAccountId = process.env.NEW_RELIC_ACCOUNT_ID;
+    this.auth = createAuthProviderFromEnv();
     if (client) {
       this.client = client;
     } else {
       // Best practice for Smithery tool discovery: do not force auth at startup
       // Allow listing tools without credentials; validate when tools are invoked
-      const apiKey = process.env.NEW_RELIC_API_KEY || '';
-      this.client = new NewRelicClient(apiKey, this.defaultAccountId);
+      this.client = new NewRelicClient(this.auth, this.defaultAccountId);
     }
+    this.restAuth = createRestAuthProvider(this.auth);
 
     this.server = new Server(
       {
@@ -61,9 +69,9 @@ export class NewRelicMCPServer {
     const alertTool = new AlertTool(this.client);
     const syntheticsTool = new SyntheticsTool(this.client);
     const nerdGraphTool = new NerdGraphTool(this.client);
-    const restDeployments = new RestDeploymentsTool();
-    const restApm = new RestApmTool();
-    const restMetrics = new RestMetricsTool();
+    const restDeployments = new RestDeploymentsTool(this.restAuth);
+    const restApm = new RestApmTool(this.restAuth);
+    const restMetrics = new RestMetricsTool(this.restAuth);
 
     // Register all tools
     const tools = [
@@ -137,7 +145,7 @@ export class NewRelicMCPServer {
 
   async start(): Promise<void> {
     // Only validate if credentials were provided; otherwise allow startup for tool discovery
-    if (process.env.NEW_RELIC_API_KEY) {
+    if (this.auth.mode !== 'none') {
       const isValid = await this.client.validateCredentials();
       if (!isValid) {
         throw new Error('Invalid New Relic API credentials');
@@ -173,31 +181,31 @@ export class NewRelicMCPServer {
           target_account_id: accountId,
         });
       case 'create_deployment':
-        return await new RestDeploymentsTool().create(
+        return await new RestDeploymentsTool(this.restAuth).create(
           args as Parameters<RestDeploymentsTool['create']>[0]
         );
       case 'list_deployments_rest':
-        return await new RestDeploymentsTool().list(
+        return await new RestDeploymentsTool(this.restAuth).list(
           args as Parameters<RestDeploymentsTool['list']>[0]
         );
       case 'delete_deployment':
-        return await new RestDeploymentsTool().delete(
+        return await new RestDeploymentsTool(this.restAuth).delete(
           args as Parameters<RestDeploymentsTool['delete']>[0]
         );
       case 'list_apm_applications_rest':
-        return await new RestApmTool().listApplications(
+        return await new RestApmTool(this.restAuth).listApplications(
           args as Parameters<RestApmTool['listApplications']>[0]
         );
       case 'list_metric_names_for_host':
-        return await new RestMetricsTool().listMetricNames(
+        return await new RestMetricsTool(this.restAuth).listMetricNames(
           args as Parameters<RestMetricsTool['listMetricNames']>[0]
         );
       case 'get_metric_data_for_host':
-        return await new RestMetricsTool().getMetricData(
+        return await new RestMetricsTool(this.restAuth).getMetricData(
           args as Parameters<RestMetricsTool['getMetricData']>[0]
         );
       case 'list_application_hosts':
-        return await new RestMetricsTool().listApplicationHosts(
+        return await new RestMetricsTool(this.restAuth).listApplicationHosts(
           args as Parameters<RestMetricsTool['listApplicationHosts']>[0]
         );
       case 'get_account_details':

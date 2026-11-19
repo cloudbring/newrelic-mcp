@@ -83,6 +83,31 @@ curl -X POST http://localhost:3000/rpc \
 - New Relic has rate limits on API calls
 - If you hit limits, wait a few minutes before retrying
 
+## Alternative: System Identity (no personal API key)
+
+Use this for cloud or automated agents. Requires the Organization Manager or Authentication Domain Manager role and a
+User API key (only for this one-time provisioning). System identities are a New Relic preview feature.
+
+1. Generate a key pair:
+   ```bash
+   openssl genrsa -out private-key.pem 4096
+   openssl rsa -in private-key.pem -pubout -out public-key.pem
+   base64 < public-key.pem | tr -d '\n'   # value for publicKey
+   ```
+2. In NerdGraph, create the identity and note its `clientId`:
+   ```graphql
+   mutation { systemIdentityCreate(name: "newrelic-mcp", organizationId: "ORG_ID", publicKey: "BASE64_PUBLIC_KEY") { id clientId } }
+   ```
+3. Create a group, add the identity, and grant the group a role on only the accounts the agent needs:
+   ```graphql
+   mutation { systemIdentityCreateGroup(name: "newrelic-mcp", organizationId: "ORG_ID") { id } }
+   mutation { systemIdentityAddToGroups(systemIdentityGroupIds: ["GROUP_ID"], systemIdentityIds: ["IDENTITY_ID"]) { systemIdentityGroups { id } } }
+   mutation { authorizationManagementGrantAccess(grantAccessOptions: { accountAccessGrants: { accountId: ACCOUNT_ID, roleId: ROLE_ID }, grantee: { id: "GROUP_ID", type: SYSTEM_IDENTITY_GROUP } }) { roles { id name } } }
+   ```
+4. Configure the server with `NEW_RELIC_CLIENT_ID` and `NEW_RELIC_PRIVATE_KEY_PATH` (or `NEW_RELIC_PRIVATE_KEY`).
+5. To revoke: remove the identity from its groups, then run `systemIdentityDelete(id: "IDENTITY_ID")`. Issued tokens
+   remain valid until their 1-hour expiry.
+
 ## Security Notes
 
 - **NEVER** commit your `.env` file to git

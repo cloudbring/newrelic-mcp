@@ -1,4 +1,5 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+import type { AuthProvider } from '../../client/auth';
 import { NewRelicRestClient, type Region } from '../../client/rest-client';
 
 type CreateDeploymentArgs = {
@@ -25,7 +26,10 @@ type DeleteDeploymentArgs = {
 };
 
 export class RestDeploymentsTool {
+  constructor(private readonly auth?: AuthProvider) {}
+
   private restFor(region?: Region): NewRelicRestClient {
+    if (this.auth) return new NewRelicRestClient({ auth: this.auth, region: region ?? 'US' });
     const apiKey = process.env.NEW_RELIC_API_KEY as string;
     return new NewRelicRestClient({ apiKey, region: region ?? 'US' });
   }

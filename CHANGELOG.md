@@ -11,6 +11,7 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 ### Added
 
+- System identity authentication (private key JWT) via `NEW_RELIC_CLIENT_ID` and `NEW_RELIC_PRIVATE_KEY` / `NEW_RELIC_PRIVATE_KEY_PATH`, with automatic 1-hour token renewal; `NEW_RELIC_API_KEY` remains supported
 - Planned: Additional New Relic tools and docs improvements
 
 ### Changed
