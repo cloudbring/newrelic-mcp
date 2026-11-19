@@ -1,3 +1,5 @@
+import { ApiKeyAuthProvider, type AuthProvider } from './auth';
+
 /**
  * New Relic data center region identifier.
  * Supports US (United States) and EU (Europe) regions.
@@ -52,16 +54,30 @@ export interface ApmApplication {
 }
 
 export class NewRelicClient {
-  private apiKey: string;
+  private auth: AuthProvider;
   private defaultAccountId?: string;
 
-  constructor(apiKey?: string, defaultAccountId?: string) {
-    this.apiKey = apiKey || process.env.NEW_RELIC_API_KEY || '';
+  constructor(apiKeyOrAuth?: string | AuthProvider, defaultAccountId?: string) {
+    this.auth =
+      typeof apiKeyOrAuth === 'object'
+        ? apiKeyOrAuth
+        : new ApiKeyAuthProvider(apiKeyOrAuth || process.env.NEW_RELIC_API_KEY || '');
     this.defaultAccountId = defaultAccountId || process.env.NEW_RELIC_ACCOUNT_ID;
+  }
+
+  getAuthProvider(): AuthProvider {
+    return this.auth;
   }
 
   async validateCredentials(): Promise<boolean> {
     try {
+      if (this.auth.mode === 'system-identity') {
+        // A system identity is not a user, so actor.user is empty for it.
+        const res = (await this.executeNerdGraphQuery<{ actor?: { accounts?: unknown[] } }>(
+          '{ actor { accounts { id } } }'
+        )) as GraphQLResponse<{ actor?: { accounts?: unknown[] } }>;
+        return !res.errors?.length && Array.isArray(res.data?.actor?.accounts);
+      }
       type UserResponse = { actor?: { user?: { id?: string; email?: string } } };
       const query = `{
         actor {
@@ -269,23 +285,30 @@ export class NewRelicClient {
     query: string,
     variables?: Record<string, unknown>
   ): Promise<GraphQLResponse<T>> {
-    // Check if API key is missing or empty
-    if (!this.apiKey || this.apiKey === '' || this.apiKey.length === 0) {
+    if (this.auth.mode === 'none') {
       throw new Error('NEW_RELIC_API_KEY environment variable is not set');
     }
 
-    const response = await fetch(NERDGRAPH_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'API-Key': this.apiKey,
-      },
-      body: JSON.stringify({ query, variables }),
-    });
+    const send = async (): Promise<Response> =>
+      fetch(NERDGRAPH_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await this.auth.getHeaders()) },
+        body: JSON.stringify({ query, variables }),
+      });
+
+    let response = await send();
+    if (response.status === 401 && this.auth.mode === 'system-identity') {
+      this.auth.invalidate();
+      response = await send();
+    }
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('Unauthorized: Invalid API key');
+        throw new Error(
+          this.auth.mode === 'system-identity'
+            ? 'Unauthorized: system identity token rejected'
+            : 'Unauthorized: Invalid API key'
+        );
       }
       throw new Error(`NerdGraph API error: ${response.status} ${response.statusText}`);
     }

@@ -208,9 +208,15 @@ npm run build
 
 ## Configuration
 
-### Required Environment Variables
+### Environment Variables
 
-- `NEW_RELIC_API_KEY` - Your New Relic User API Key (required)
+Authenticate with **either** a User API key **or** a system identity (see below).
+
+- `NEW_RELIC_API_KEY` - Your New Relic User API Key
+- `NEW_RELIC_CLIENT_ID` - System identity client ID (alternative to the API key)
+- `NEW_RELIC_PRIVATE_KEY` - System identity RSA private key, PEM contents (real newlines, `\n` escapes, or base64)
+- `NEW_RELIC_PRIVATE_KEY_PATH` - Path to the PEM file, instead of `NEW_RELIC_PRIVATE_KEY`
+- `NEW_RELIC_OAUTH_TOKEN_URL` - Optional token endpoint override (https only)
 - `NEW_RELIC_ACCOUNT_ID` - Your New Relic Account ID (optional, can be provided per tool call)
 - `NEW_RELIC_REGION` - New Relic data center region: `US` (default) or `EU` (optional)
 
@@ -231,6 +237,35 @@ npm run build
    - If not specified, defaults to `US`
 
 For detailed setup instructions, see [docs/new-relic-setup.md](docs/new-relic-setup.md).
+
+### System identity authentication (for cloud agents)
+
+Instead of a personal User API key, the server can authenticate as a New Relic
+[system identity](https://docs.newrelic.com/docs/accounts/accounts-billing/new-relic-one-user-management/system-identities/)
+using a private key JWT. The server signs a short-lived JWT, exchanges it for a 1-hour access token, caches it, and
+renews it automatically.
+
+```json
+{
+  "mcpServers": {
+    "newrelic": {
+      "command": "npx",
+      "args": ["-y", "newrelic-mcp"],
+      "env": {
+        "NEW_RELIC_CLIENT_ID": "your-system-identity-client-id",
+        "NEW_RELIC_PRIVATE_KEY_PATH": "/run/secrets/newrelic-private-key.pem",
+        "NEW_RELIC_ACCOUNT_ID": "1234567"
+      }
+    }
+  }
+}
+```
+
+- If both a system identity and `NEW_RELIC_API_KEY` are set, NerdGraph tools use the system identity.
+- The REST v2 tools (`*_rest`, deployments, host metrics) only document `Api-Key` auth. In system identity mode they use
+  `NEW_RELIC_API_KEY` if set, otherwise they return an error saying an API key is required.
+- The private key does not expire, so grant its group a least-privilege role (for example read-only on specific
+  accounts) and delete the identity to revoke it. Already-issued tokens work until their 1-hour expiry.
 
 ## Usage Examples
 
